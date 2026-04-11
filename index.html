@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janbot Industries</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #FF6600;
+            --bg: #FEFEFE;
+            --text: #0A0A0A;
+            --muted: rgba(0, 0, 0, 0.4);
+            --border: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+            max-width: 580px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 360px;
+            height: auto;
+        }
+
+        .wordmark {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: -3.5rem;
+        }
+
+        .tagline {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+
+        .tagline span {
+            color: var(--orange);
+        }
+
+        .subline {
+            font-size: 1.1rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .domain {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            color: rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <img src="janbot-logo.png" alt="Janbot Industries" class="logo">
+        <div class="wordmark">Janbot Industries</div>
+
+        <h1 class="tagline">
+            Work smarter.<br>
+            Let the bots handle <span>the busy work.</span>
+        </h1>
+
+        <p class="subline">Made by bots, for people.</p>
+    </div>
+
+    <div class="domain">janbot.ai &nbsp;·&nbsp; Janbot™ · © 2026 Janbot Industries. All Rights Reserved.</div>
+</body>
+</html>
