@@ -1,108 +1,1889 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Janbot Industries</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Janbot · on-device AI agent for your Mac</title>
+<meta name="description" content="Janbot is a native Mac agent. It reads documents, runs commands, searches the web, remembers what matters, and runs on a schedule. Use local or cloud models, with everything stored on your machine.">
+<meta property="og:title" content="Janbot · on-device AI agent for your Mac">
+<meta property="og:description" content="A native Mac agent with hands. Any model, your choice. Everything stays on your machine.">
+<meta property="og:url" content="https://janbot.ai">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..750&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-        :root {
-            --orange: #FF6600;
-            --bg: #FEFEFE;
-            --text: #0A0A0A;
-            --muted: rgba(0, 0, 0, 0.4);
-            --border: rgba(0, 0, 0, 0.1);
-        }
+  :root {
+    --orange:     #FF6A00;
+    --orange-deep:#D25400;   /* tone-on-tone marks on the orange field */
+    --ink:        #131110;   /* black type on the orange field */
+    --coal:       #121212;   /* the workshop — page body */
+    --coal-2:     #161616;
+    --bone:       #F0EBE1;
+    --bone-2:     rgba(240, 235, 225, 0.64);
+    --bone-3:     rgba(240, 235, 225, 0.38);
+    --line:       rgba(240, 235, 225, 0.14);
+    --line-soft:  rgba(240, 235, 225, 0.08);
+    --cream:      #EFE8DA;   /* the ticker strip */
+    --ok:         #7FB88D;
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Fragment Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+    --ease: cubic-bezier(0.33, 0, 0.15, 1);
+    --focus-ring: 0 0 0 3px rgba(255, 106, 0, 0.5);
+  }
 
+  html { scroll-behavior: smooth; }
 
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 1rem;
-            max-width: 580px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
+  body {
+    font-family: var(--sans);
+    background: var(--coal);
+    color: var(--bone);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
 
-        .logo {
-            width: 360px;
-            height: auto;
-        }
+  ::selection { background: rgba(255, 106, 0, 0.35); }
 
-        .wordmark {
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-top: -3.5rem;
-        }
+  a { color: inherit; }
 
-        .tagline {
-            font-size: clamp(1.8rem, 5vw, 2.6rem);
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: -0.03em;
-            color: var(--text);
-        }
+  :where(a, button):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 999px;
+  }
 
-        .tagline span {
-            color: var(--orange);
-        }
+  .mono { font-family: var(--mono); }
 
-        .subline {
-            font-size: 1.1rem;
-            color: var(--muted);
-            font-weight: 500;
-        }
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 12px;
+    z-index: 1000;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .skip:focus { left: 12px; }
 
-        .domain {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-            color: rgba(0, 0, 0, 0.15);
-        }
-    </style>
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 44px);
+  }
+
+  /* ── Pill buttons — small, mono, technical ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 11px 22px;
+    border-radius: 999px;
+    transition: transform 0.18s var(--ease), background 0.18s var(--ease),
+                color 0.18s var(--ease), border-color 0.18s var(--ease);
+    white-space: nowrap;
+  }
+  .pill:hover { transform: translateY(-1px); }
+
+  /* ═══════════ HERO — an orange panel, framed on the dark page ═══════════ */
+  :root { --frame: clamp(10px, 1.6vw, 18px); }
+
+  .top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px clamp(20px, 4vw, 44px);
+    color: var(--bone);
+  }
+  .top-nav .plain {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--bone-2);
+  }
+  .top-nav .plain:hover { color: var(--bone); }
+  .pill-hot { background: var(--orange); color: var(--ink); }
+  .pill-hot:hover { background: #FF7D1F; }
+  .hero-nav-links { display: flex; align-items: center; gap: 20px; }
+
+  #hero {
+    padding: 4px var(--frame) 0;
+    background: var(--coal);
+  }
+  .hero-panel {
+    position: relative;
+    background:
+      radial-gradient(125% 92% at 50% -12%, #FF9042 0%, var(--orange) 44%, #EF6000 100%);
+    color: var(--ink);
+    border-radius: clamp(18px, 2.4vw, 30px);
+    overflow: hidden;
+    min-height: min(84vh, 920px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* faint blueprint grid, lit from the top and fading toward the edges */
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(19, 17, 16, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(19, 17, 16, 0.055) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(120% 105% at 50% 0%, #000 26%, transparent 80%);
+            mask-image: radial-gradient(120% 105% at 50% 0%, #000 26%, transparent 80%);
+  }
+  /* film grain so the orange reads as a lit surface, not a flat swatch */
+  .hero-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hero-panel ::selection { background: rgba(19, 17, 16, 0.85); color: var(--orange); }
+
+  /* warm flashlight that follows the cursor and lifts the blueprint texture */
+  .hero-spot {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 233, 205, 0.55), rgba(255, 188, 120, 0.14) 42%, transparent 64%);
+    mix-blend-mode: soft-light;
+  }
+  .hero-panel:hover .hero-spot { opacity: 1; }
+
+  /* the parallax stage that holds the mascot + drifting toolbelt */
+  .hero-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .scene-layer {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  .hero-stamp .pupil {
+    fill: #FFCE9C;
+    transition: transform 0.12s var(--ease);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .brand-glyph {
+    width: 26px;
+    height: 26px;
+    display: block;
+  }
+  .brand-mark {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+  }
+  .pill-ink { background: var(--ink); color: var(--cream); }
+  .pill-ink:hover { background: #000; }
+
+  /* Tone-on-tone bot, half-risen from the panel's corner — and alive */
+  .hero-stamp {
+    position: absolute;
+    right: -3%;
+    bottom: -22%;
+    width: clamp(280px, 34%, 500px);
+    height: auto;
+    z-index: 1;
+  }
+  /* eyes blink on a lazy, human-ish cadence */
+  .hero-stamp .eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: bot-blink 5.6s var(--ease) infinite;
+  }
+  .hero-stamp .eye.r { animation-delay: 0.08s; }
+  @keyframes bot-blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95%, 97%      { transform: scaleY(0.12); }
+  }
+  /* antenna beacon — the "agent is on" light */
+  .hero-stamp .beacon { fill: #FFCE9C; r: 11; }
+  .hero-stamp .beacon-halo {
+    fill: none;
+    stroke: #FFCE9C;
+    stroke-width: 4;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: bot-beacon 2.4s var(--ease) infinite;
+  }
+  @keyframes bot-beacon {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(3.2); opacity: 0; }
+    100% { transform: scale(3.2); opacity: 0; }
+  }
+
+  /* the toolbelt — mono tokens drifting tone-on-tone behind the type */
+  .tok {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: clamp(11px, 1.15vw, 14px);
+    letter-spacing: 0.02em;
+    color: rgba(19, 17, 16, 0.28);
+    white-space: nowrap;
+    animation: tok-drift 9s var(--ease) infinite;
+    will-change: transform;
+    transition: color 0.3s var(--ease), text-shadow 0.3s var(--ease);
+  }
+  .tok::before {
+    content: '▸ ';
+    color: rgba(19, 17, 16, 0.32);
+    transition: color 0.3s var(--ease);
+  }
+  /* a tool "wakes up" as the cursor passes near it */
+  .tok.near {
+    color: var(--ink);
+    text-shadow: 0 0 18px rgba(255, 240, 220, 0.6);
+  }
+  .tok.near::before { color: var(--ink); }
+  @keyframes tok-drift {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-9px); }
+  }
+
+  .hero-body {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 940px;
+    margin: 0 auto;
+    padding: clamp(70px, 10vh, 120px) clamp(24px, 4.5vw, 64px);
+  }
+  .hero-kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    opacity: 0.8;
+  }
+  h1 {
+    font-weight: 640;
+    font-size: clamp(44px, 7.6vw, 102px);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    max-width: 13ch;
+    margin: 0 auto 28px;
+  }
+  /* The payoff phrase switches voice to the machine layer — and types itself in */
+  .hh {
+    font-family: var(--mono);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.84em;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+  .nowrap { white-space: nowrap; }
+  .hh-type::after {
+    content: '';
+    display: inline-block;
+    width: 0.46em;
+    height: 0.92em;
+    margin-left: 0.04em;
+    background: currentColor;
+    transform: translateY(0.1em);
+    animation: hh-caret 0.9s steps(1) infinite;
+  }
+  .hh.done .hh-type::after { animation: none; opacity: 0; }
+  @keyframes hh-caret { 50% { opacity: 0; } }
+
+  /* per-word mask-rise for the headline on load */
+  .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+  .word > span {
+    display: inline-block;
+    transform: translateY(115%);
+    animation: word-rise 0.9s var(--ease) both;
+    animation-delay: var(--d, 0s);
+  }
+  @keyframes word-rise {
+    from { transform: translateY(115%); }
+    to   { transform: translateY(0); }
+  }
+  .hero-sub {
+    font-size: clamp(16px, 1.8vw, 19px);
+    line-height: 1.55;
+    max-width: 48ch;
+    margin: 0 auto 34px;
+  }
+  /* highlighter that sweeps in under the local-first phrase */
+  .hero-sub .mark {
+    font-weight: 600;
+    padding: 0.04em 0.16em;
+    border-radius: 3px;
+    background-image: linear-gradient(rgba(19, 17, 16, 0.17), rgba(19, 17, 16, 0.17));
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 0% 100%;
+    -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+    animation: mark-in 0.75s var(--ease) 1s forwards;
+  }
+  @keyframes mark-in { to { background-size: 100% 100%; } }
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+  }
+  .pill-line {
+    border: 1.5px solid rgba(19, 17, 16, 0.75);
+    color: var(--ink);
+  }
+  .pill-line:hover { background: rgba(19, 17, 16, 0.08); }
+  .hero-fine {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    margin-top: 18px;
+    opacity: 0.65;
+  }
+
+  /* Load choreography */
+  .rise { opacity: 0; animation: rise 0.9s var(--ease) forwards; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ═══════════ TICKER — a tape label under the poster ═══════════ */
+  .ticker {
+    background: var(--cream);
+    color: var(--ink);
+    margin: var(--frame) var(--frame) 0;
+    border-radius: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-track {
+    display: inline-flex;
+    padding: 12px 0;
+    animation: tick 46s linear infinite;
+  }
+  @keyframes tick {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .ticker-set {
+    display: inline-flex;
+    align-items: center;
+  }
+  .ticker-set span {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .ticker-set i {
+    font-style: normal;
+    color: var(--orange);
+    padding: 0 26px;
+    font-size: 10px;
+  }
+
+  /* ═══════════ Section machinery ═══════════ */
+  section.block { padding: clamp(90px, 13vh, 170px) 0; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    border: 1px solid rgba(255, 106, 0, 0.4);
+    padding: 7px 14px;
+    margin-bottom: 34px;
+  }
+  .center { text-align: center; }
+  .center .chip { margin-left: auto; margin-right: auto; }
+
+  h2 {
+    font-weight: 620;
+    font-size: clamp(34px, 5.2vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .statement-sub {
+    color: var(--bone-2);
+    max-width: 54ch;
+    margin: 22px auto 0;
+    font-size: clamp(15.5px, 1.7vw, 18px);
+  }
+  .center .statement-sub { margin-left: auto; margin-right: auto; }
+
+  .rev {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .rev.in { opacity: 1; transform: none; }
+
+  /* ═══════════ THE PROBLEM — grid with radar ═══════════ */
+  .grid-frame {
+    margin-top: clamp(48px, 7vh, 76px);
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  .cell {
+    padding: clamp(22px, 3vw, 34px);
+    border-left: 1px solid var(--line-soft);
+    border-top: 1px solid var(--line-soft);
+  }
+  .grid-frame > :first-child,
+  .grid-frame > :nth-child(2),
+  .grid-frame > :nth-child(3) { border-top: none; }
+  .grid-frame > .cell-radar { border-left: none; }
+  .cell-radar {
+    grid-row: 1 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background:
+      radial-gradient(circle at center, rgba(255, 106, 0, 0.05), transparent 65%);
+  }
+  .cell-kicker {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    display: block;
+    margin-bottom: 14px;
+  }
+  .cell h3 {
+    font-weight: 600;
+    font-size: clamp(18px, 2vw, 22px);
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .cell p { font-size: 14px; color: var(--bone-3); line-height: 1.6; }
+
+  .radar { width: 100%; max-width: 300px; height: auto; }
+  .radar .ring { fill: none; stroke: var(--line); stroke-width: 1; }
+  .radar .tick { stroke: var(--line); stroke-width: 1; }
+  .radar .dot  { fill: var(--orange); }
+  .radar .halo { fill: none; stroke: rgba(255, 106, 0, 0.5); stroke-width: 1; }
+  .radar text {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+    fill: var(--bone-3);
+  }
+  @keyframes halo {
+    from { r: 6; opacity: 0.9; }
+    to   { r: 26; opacity: 0; }
+  }
+  .radar .halo { animation: halo 2.6s var(--ease) infinite; }
+
+  /* rings breathe outward in sequence */
+  .radar .ring { animation: radar-ring 3.8s var(--ease) infinite; }
+  .radar .ring:nth-of-type(2) { animation-delay: 0.5s; }
+  .radar .ring:nth-of-type(3) { animation-delay: 1s; }
+  @keyframes radar-ring {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; stroke: rgba(255, 106, 0, 0.22); }
+  }
+
+  /* the sweep beam — a scanning arm with a trailing wedge */
+  .radar .sweep { transform-origin: 150px 150px; animation: radar-sweep 4.6s linear infinite; }
+  .radar .sweep-wedge { fill: rgba(255, 106, 0, 0.12); }
+  .radar .sweep-arm { stroke: rgba(255, 106, 0, 0.7); stroke-width: 1.4; }
+  @keyframes radar-sweep { to { transform: rotate(360deg); } }
+
+  /* the core pip pulses; the remote node blinks; context leaks to the cloud */
+  .radar .core { transform-origin: 150px 150px; animation: radar-core 2.4s var(--ease) infinite; }
+  @keyframes radar-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.55); } }
+  .radar .node-remote { animation: radar-remote 1.5s var(--ease) infinite; }
+  @keyframes radar-remote { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.95; } }
+  .radar .leak {
+    fill: none;
+    stroke: rgba(255, 106, 0, 0.8);
+    stroke-width: 1.4;
+    stroke-dasharray: 2 6;
+    animation: radar-leak 0.7s linear infinite;
+  }
+  @keyframes radar-leak { to { stroke-dashoffset: -16; } }
+
+  /* ═══════════ THE BLUEPRINT — flow diagram ═══════════ */
+  .blueprint-wrap {
+    margin: clamp(52px, 8vh, 88px) auto 0;
+    max-width: 940px;
+    border: 1px solid var(--line);
+    background: var(--coal-2);
+    padding: clamp(18px, 3vw, 40px);
+  }
+  .blueprint-head {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-3);
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .blueprint { width: 100%; height: auto; display: block; }
+  .blueprint .box { fill: none; stroke: var(--line); stroke-width: 1; }
+  .blueprint .box-hot { fill: rgba(255, 106, 0, 0.06); stroke: rgba(255, 106, 0, 0.55); }
+  .blueprint .wire { stroke: var(--line); stroke-width: 1; fill: none; }
+  .blueprint .wire-dead { stroke: var(--line-soft); stroke-dasharray: 3 5; }
+  .blueprint .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    fill: var(--bone);
+  }
+  .blueprint .label-sub { font-size: 8.5px; fill: var(--bone-3); letter-spacing: 0.14em; }
+  .blueprint .label-hot { fill: var(--orange); }
+  .blueprint .label-dead { fill: var(--bone-3); text-decoration: line-through; }
+  .blueprint .cross { stroke: var(--orange); stroke-width: 1.5; }
+
+  /* energy flowing forward along every live wire */
+  .blueprint .flow {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 3 26;
+    filter: drop-shadow(0 0 3px rgba(255, 106, 0, 0.85));
+    animation: bp-flow 1.15s linear infinite;
+  }
+  @keyframes bp-flow { to { stroke-dashoffset: -29; } }
+
+  /* the local-inference core breathes */
+  .blueprint .box-hot { animation: bp-hot 3s var(--ease) infinite; }
+  @keyframes bp-hot {
+    0%, 100% { fill: rgba(255, 106, 0, 0.06); stroke: rgba(255, 106, 0, 0.55); }
+    50%      { fill: rgba(255, 106, 0, 0.14); stroke: rgba(255, 106, 0, 0.95);
+               filter: drop-shadow(0 0 7px rgba(255, 106, 0, 0.5)); }
+  }
+  .blueprint .label-hot { animation: bp-label 3s var(--ease) infinite; }
+  @keyframes bp-label { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+
+  /* the severed telemetry mark twitches, then gives up */
+  .blueprint .cross { animation: bp-dead 4.5s steps(1) infinite; }
+  @keyframes bp-dead { 0%, 86%, 100% { opacity: 1; } 88%, 92% { opacity: 0.25; } }
+
+  /* ═══════════ RUN LOG — scroll-scrubbed prototype ═══════════ */
+  .runlog-stage {
+    position: relative;
+    height: 360vh;
+    margin-top: clamp(28px, 5vh, 56px);
+  }
+  .runlog-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1400px;
+  }
+  /* ambient glow that breathes behind the terminal */
+  .runlog-sticky::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(720px, 82%);
+    height: 360px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, rgba(255, 106, 0, 0.2), transparent 70%);
+    filter: blur(46px);
+    z-index: 0;
+    pointer-events: none;
+    animation: rl-breathe 4.6s var(--ease) infinite;
+  }
+  @keyframes rl-breathe {
+    0%, 100% { opacity: 0.16; transform: translate(-50%, -50%) scale(1); }
+    50%      { opacity: 0.42; transform: translate(-50%, -50%) scale(1.09); }
+  }
+  .runlog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 780px;
+    border: 1px solid var(--line);
+    background: var(--coal-2);
+    text-align: left;
+    overflow: hidden;
+    transform-origin: center 40%;
+    will-change: transform, opacity;
+    transition: box-shadow 0.6s var(--ease), border-color 0.6s var(--ease),
+                transform 0.12s linear;
+  }
+  /* faint CRT scanlines drifting over the terminal */
+  .runlog::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(240, 235, 225, 0.035) 0 1px,
+      transparent 1px 3px
+    );
+    opacity: 0;
+    transition: opacity 0.6s var(--ease);
+    animation: rl-scan 7s linear infinite;
+  }
+  .runlog.live::after { opacity: 1; }
+  @keyframes rl-scan {
+    to { background-position: 0 90px; }
+  }
+  .runlog.live {
+    border-color: rgba(255, 106, 0, 0.32);
+    box-shadow: 0 0 0 1px rgba(255, 106, 0, 0.1),
+                0 50px 120px -50px rgba(255, 106, 0, 0.6);
+  }
+  .runlog-head {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bone-3);
+  }
+  .runlog-head b { font-weight: 400; color: var(--bone-2); }
+  .rl-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--orange);
+  }
+  .rl-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--orange);
+    animation: rl-pulse 1.4s var(--ease) infinite;
+  }
+  @keyframes rl-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(255, 106, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0); }
+  }
+  .runlog.done .rl-status { color: var(--ok); }
+  .runlog.done .rl-dot { background: var(--ok); animation: none; }
+
+  .runlog-rows { padding: 10px 0; }
+  .lrow {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    padding: 7px 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--bone-3);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+    will-change: opacity, transform;
+  }
+  .lrow.show {
+    opacity: 1;
+    transform: none;
+    animation: rl-in 0.55s var(--ease);
+  }
+  @keyframes rl-in {
+    0%   { background: rgba(255, 106, 0, 0.16); }
+    100% { background: transparent; }
+  }
+  .lrow.show:hover:not(.active):not(.lrow-user) {
+    background: rgba(240, 235, 225, 0.04);
+  }
+
+  /* the step currently executing */
+  .lrow.active {
+    background: rgba(255, 106, 0, 0.055);
+    box-shadow: inset 2px 0 0 var(--orange);
+  }
+  .lrow.active > span:last-child::after {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 1.05em;
+    margin-left: 5px;
+    background: var(--orange);
+    transform: translateY(2px);
+    animation: rl-blink 1s steps(1) infinite;
+  }
+  @keyframes rl-blink { 50% { opacity: 0; } }
+  /* spinner replaces the status glyph while a step runs */
+  .lrow.active:not(.lrow-user) .st {
+    color: transparent;
+    animation: none;
+  }
+  .lrow.active:not(.lrow-user) .st::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid rgba(255, 106, 0, 0.28);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: rl-spin 0.7s linear infinite;
+  }
+  @keyframes rl-spin { to { transform: rotate(360deg); } }
+
+  .rl-bar { height: 2px; background: var(--line); overflow: hidden; }
+  .rl-bar > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(255, 106, 0, 0.15), var(--orange));
+    box-shadow: 0 0 10px 1px rgba(255, 106, 0, 0.5);
+    transition: width 0.15s linear;
+  }
+  .runlog.done .rl-bar > i { box-shadow: none; }
+
+  .rl-meta { color: var(--bone-3); }
+  .rl-meta b { font-weight: 400; color: var(--bone-2); }
+
+  .lrow .st { flex: 0 0 12px; position: relative; }
+  .lrow .st-ok { color: var(--ok); }
+  .lrow .tool { color: var(--bone); }
+  .lrow.lrow-user { color: var(--bone-2); font-style: italic; padding-bottom: 12px; }
+  .lrow-gate {
+    background: rgba(255, 106, 0, 0.06);
+    border-top: 1px solid rgba(255, 106, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 106, 0, 0.25);
+    padding-top: 11px;
+    padding-bottom: 11px;
+    margin: 6px 0;
+    color: var(--bone-2);
+  }
+  .lrow-gate .st { color: var(--orange); }
+  .gate-chip {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    border: 1px solid rgba(255, 106, 0, 0.4);
+    padding: 2px 8px;
+    margin-right: 6px;
+  }
+  .gate-ok { color: var(--ok); }
+  .lrow-done { color: var(--bone-2); padding-top: 12px; }
+
+  /* ═══════════ CAPABILITIES — bordered six ═══════════ */
+  .six {
+    margin-top: clamp(48px, 7vh, 76px);
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .six .cell { border-top: none; }
+  .six .cell:nth-child(3n+1) { border-left: none; }
+  .six .cell:nth-child(n+4) { border-top: 1px solid var(--line-soft); }
+
+  /* content rises in a stagger — the container just triggers the cells */
+  .six.rev { opacity: 1; transform: none; }
+  .six .cell {
+    position: relative;
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease),
+                background 0.3s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .six.in .cell { opacity: 1; transform: none; }
+  .six.in .cell:nth-child(1) { transition-delay: 0.04s; }
+  .six.in .cell:nth-child(2) { transition-delay: 0.12s; }
+  .six.in .cell:nth-child(3) { transition-delay: 0.20s; }
+  .six.in .cell:nth-child(4) { transition-delay: 0.28s; }
+  .six.in .cell:nth-child(5) { transition-delay: 0.36s; }
+  .six.in .cell:nth-child(6) { transition-delay: 0.44s; }
+
+  /* hover: the card lights up and an orange rail slides in */
+  .six .cell h3 { transition: color 0.3s var(--ease); }
+  .six .cell:hover {
+    background: radial-gradient(130% 150% at 0% 0%, rgba(255, 106, 0, 0.07), transparent 62%);
+    box-shadow: inset 3px 0 0 var(--orange);
+  }
+  .six .cell:hover h3 { color: #fff; }
+
+  /* the toolkit diamonds breathe in sequence, then snap on hover */
+  .six .dia {
+    display: inline-block;
+    margin-right: 0.5em;
+    transition: transform 0.45s var(--ease), color 0.3s var(--ease);
+    animation: dia-breathe 3.4s var(--ease) infinite;
+  }
+  .six .cell:nth-child(2) .dia { animation-delay: 0.3s; }
+  .six .cell:nth-child(3) .dia { animation-delay: 0.6s; }
+  .six .cell:nth-child(4) .dia { animation-delay: 0.9s; }
+  .six .cell:nth-child(5) .dia { animation-delay: 1.2s; }
+  .six .cell:nth-child(6) .dia { animation-delay: 1.5s; }
+  @keyframes dia-breathe { 0%, 100% { opacity: 0.65; } 50% { opacity: 1; } }
+  .six .cell:hover .dia { transform: rotate(90deg) scale(1.3); color: #FF7D1F; }
+
+  /* mono strings catch a slow sheen sweeping left */
+  .six .cell p .m {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: linear-gradient(100deg, var(--bone-2) 0 42%, #FFE9CD 50%, var(--bone-2) 58% 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: m-sheen 4.5s linear infinite;
+  }
+  @keyframes m-sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+  /* ═══════════ OFFLINE ═══════════ */
+  #offline .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(36px, 6vw, 90px);
+    align-items: center;
+  }
+  .offline-art {
+    border: 1px solid var(--line);
+    background: var(--coal-2);
+    padding: clamp(24px, 3vw, 40px);
+  }
+  #offline h2 { font-size: clamp(32px, 4vw, 54px); }
+  #offline .chip { margin-bottom: 26px; }
+  #offline .body-copy { color: var(--bone-2); margin-top: 18px; max-width: 46ch; }
+  .db-path {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--bone-2);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    margin-top: 26px;
+    overflow-wrap: anywhere;
+  }
+  .providers { margin-top: 28px; max-width: 46ch; }
+  .prov-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .prov-tag {
+    flex: 0 0 auto;
+    width: 54px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-3);
+  }
+  .pchip {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--bone-2);
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease),
+                background 0.25s var(--ease);
+  }
+  .pchip:hover {
+    border-color: rgba(255, 106, 0, 0.6);
+    color: var(--bone);
+    background: rgba(255, 106, 0, 0.05);
+  }
+  .prov-note {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--bone-3);
+    margin-top: 16px;
+  }
+  .prov-note b { font-weight: 400; color: var(--bone-2); }
+  .providers-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bone-3);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ═══════════ APPROACH statement ═══════════ */
+  #approach { border-top: 1px solid var(--line-soft); }
+  #approach .statement-sub { max-width: 50ch; }
+
+  /* ═══════════ CTA — the orange panel returns ═══════════ */
+  #cta {
+    background: var(--coal);
+    padding: 0 var(--frame) var(--frame);
+  }
+  .cta-panel {
+    position: relative;
+    background: var(--orange);
+    color: var(--ink);
+    border-radius: clamp(18px, 2.4vw, 30px);
+    overflow: hidden;
+  }
+  .cta-panel ::selection { background: rgba(19, 17, 16, 0.85); color: var(--orange); }
+  #cta .wrap {
+    padding-top: clamp(80px, 11vh, 140px);
+    padding-bottom: clamp(80px, 11vh, 140px);
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  #cta h2 {
+    font-size: clamp(44px, 7.6vw, 104px);
+    max-width: 12ch;
+    margin: 0 auto;
+  }
+  #cta .cta-sub {
+    margin: 24px auto 36px;
+    max-width: 44ch;
+    font-size: clamp(16px, 1.8vw, 19px);
+  }
+  #cta .hero-fine { margin-top: 18px; }
+  .cta-stamp {
+    position: absolute;
+    right: -5%;
+    bottom: -18%;
+    width: clamp(280px, 36%, 520px);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .cta-founding {
+    position: relative;
+    z-index: 2;
+    margin: clamp(48px, 7vh, 72px) auto 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(19, 17, 16, 0.3);
+    max-width: 56ch;
+    font-size: 14.5px;
+  }
+  .cta-founding a { color: var(--ink); }
+
+  /* ═══════════ FOOTER ═══════════ */
+  footer {
+    position: relative;
+    background: #0D0D0D;
+    overflow: hidden;
+    border-top: 1px solid var(--line-soft);
+  }
+  /* faint blueprint grid rising from the bottom edge, like the hero */
+  footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(130% 120% at 50% 118%, #000 18%, transparent 72%);
+            mask-image: radial-gradient(130% 120% at 50% 118%, #000 18%, transparent 72%);
+  }
+
+  /* ── the sign-off: live status + giant wordmark ── */
+  .foot-sign {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(44px, 8vh, 96px) clamp(20px, 4vw, 44px) 4px;
+  }
+  .foot-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-3);
+    margin-bottom: clamp(16px, 3vh, 28px);
+  }
+  .foot-status b { font-weight: 400; color: var(--ok); }
+  .foot-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    animation: foot-pulse 1.8s var(--ease) infinite;
+  }
+  @keyframes foot-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(127, 184, 141, 0.5); }
+    70%  { box-shadow: 0 0 0 8px rgba(127, 184, 141, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(127, 184, 141, 0); }
+  }
+
+  .foot-mark {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2.4vw, 30px);
+    text-decoration: none;
+    color: var(--bone);
+    width: fit-content;
+  }
+  .foot-glyph { width: clamp(38px, 6vw, 80px); height: auto; color: var(--bone-2); flex: 0 0 auto; }
+  .foot-glyph .fb {
+    fill: var(--orange);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: foot-beacon 2s var(--ease) infinite;
+  }
+  @keyframes foot-beacon { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; transform: scale(1.35); } }
+  .foot-glyph .fe {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: bot-blink 5.6s var(--ease) infinite;
+  }
+  .foot-word {
+    display: flex;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(52px, 14vw, 188px);
+    line-height: 0.82;
+    letter-spacing: -0.045em;
+    color: var(--bone);
+  }
+  .foot-word span {
+    display: inline-block;
+    transition: transform 0.4s var(--ease), color 0.4s var(--ease);
+  }
+  /* a ripple lift + orange wash when you hover the wordmark */
+  .foot-mark:hover .foot-word span { color: var(--orange); transform: translateY(-16px); }
+  .foot-mark .foot-word span:nth-child(1) { transition-delay: 0s; }
+  .foot-mark .foot-word span:nth-child(2) { transition-delay: 0.04s; }
+  .foot-mark .foot-word span:nth-child(3) { transition-delay: 0.08s; }
+  .foot-mark .foot-word span:nth-child(4) { transition-delay: 0.12s; }
+  .foot-mark .foot-word span:nth-child(5) { transition-delay: 0.16s; }
+  .foot-mark .foot-word span:nth-child(6) { transition-delay: 0.20s; }
+
+  .foot {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 26px clamp(20px, 4vw, 44px) 30px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .foot span, .foot a {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: var(--bone-3);
+    text-decoration: none;
+  }
+  /* the Dutch swearing easter egg, revealed on hover */
+  .foot-egg { cursor: help; }
+  .foot-egg .egg { color: var(--orange); opacity: 0; transition: opacity 0.35s var(--ease); }
+  .foot-egg:hover .egg { opacity: 1; }
+
+  .foot-links { display: flex; gap: 22px; }
+  .foot-links a { position: relative; }
+  .foot-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 1px;
+    width: 100%;
+    background: var(--orange);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+  }
+  .foot-links a:hover { color: var(--bone); }
+  .foot-links a:hover::after { transform: scaleX(1); }
+
+  /* ═══════════ Responsive ═══════════ */
+  @media (max-width: 900px) {
+    .grid-frame { grid-template-columns: 1fr 1fr; }
+    .cell-radar { grid-row: auto; grid-column: 1 / 3; border-left: none; min-height: 260px; }
+    .grid-frame > .cell { border-top: 1px solid var(--line-soft); }
+    .grid-frame > .cell:nth-child(2n) { border-left: none; }
+    .grid-frame > .cell:nth-child(2n+1) { border-left: 1px solid var(--line-soft); }
+    .grid-frame > .cell-radar { border-top: none; }
+    .six { grid-template-columns: 1fr 1fr; }
+    .six .cell { border-left: 1px solid var(--line-soft) !important; border-top: 1px solid var(--line-soft) !important; }
+    .six .cell:nth-child(2n+1) { border-left: none !important; }
+    .six .cell:nth-child(-n+2) { border-top: none !important; }
+    #offline .wrap { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    h1 { font-size: clamp(38px, 11.5vw, 52px); }
+    .tok { display: none; }
+    .hero-stamp { right: -16%; bottom: -10%; width: 56%; opacity: 0.85; }
+    .grid-frame, .six { grid-template-columns: 1fr; }
+    .grid-frame > .cell, .six .cell { border-left: none !important; }
+    .cell-radar { grid-column: auto; }
+    .lrow { font-size: 11.5px; gap: 10px; overflow-wrap: anywhere; }
+    .runlog-stage { height: 240vh; }
+    .rl-meta { display: none; }
+    .top-nav .plain { display: none; }
+    .ticker-set span { font-size: 11px; }
+  }
+</style>
 </head>
 <body>
-    <div class="wrapper">
-        <img src="janbot-logo.png" alt="Janbot Industries" class="logo">
-        <div class="wordmark">Janbot Industries</div>
 
-        <h1 class="tagline">
-            Work smarter.<br>
-            Let the bots handle <span>the busy work.</span>
-        </h1>
+<a class="skip" href="#main">Skip to content</a>
 
-        <p class="subline">Made by bots, for people.</p>
+<!-- ═══ NAV ═══ -->
+<nav class="top-nav" aria-label="Site">
+  <a class="brand" href="#" aria-label="Janbot home">
+    <svg class="brand-glyph" viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="3" y="8" width="26" height="21" rx="6" fill="none" stroke="currentColor" stroke-width="2.4"/>
+      <line x1="16" y1="8" x2="16" y2="3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="16" cy="2.6" r="2.2" fill="currentColor"/>
+      <circle cx="11" cy="18" r="2.6" fill="currentColor"/>
+      <circle cx="21" cy="18" r="2.6" fill="currentColor"/>
+    </svg>
+    <span class="brand-mark">JANBOT</span>
+  </a>
+  <div class="hero-nav-links">
+    <a class="plain" href="docs.html">Docs</a>
+    <a class="pill pill-hot" href="janbot-latest.dmg" download>Download</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header id="hero">
+  <div class="hero-panel">
+    <!-- cursor-tracking flashlight over the textured panel -->
+    <div class="hero-spot" aria-hidden="true"></div>
+
+    <!-- Parallax stage: layers move at different depths as you point -->
+    <div class="hero-scene" id="heroScene" aria-hidden="true">
+      <!-- toolbelt: foreground, moves the most -->
+      <div class="scene-layer" data-depth="1.5">
+        <span class="tok" style="left:7%;  top:30%; animation-delay:0s">read_document</span>
+        <span class="tok" style="left:5%;  top:66%; animation-delay:1.6s">bash</span>
+        <span class="tok" style="right:8%; top:24%; animation-delay:2.8s">web_search</span>
+        <span class="tok" style="right:22%;top:82%; animation-delay:4.1s">store_memory</span>
+      </div>
+
+      <!-- mascot: anchored, moves less; eyes track the cursor -->
+      <div class="scene-layer" data-depth="0.55">
+        <svg class="hero-stamp" viewBox="0 0 320 320" aria-hidden="true">
+          <g fill="none" stroke="#D25400" stroke-width="10">
+            <rect x="40" y="80" width="240" height="200" rx="48"/>
+            <line x1="160" y1="80" x2="160" y2="34" stroke-linecap="round"/>
+          </g>
+          <circle class="beacon-halo" cx="160" cy="28" r="16"/>
+          <circle class="beacon" cx="160" cy="28" r="16"/>
+          <g class="eye l"><circle cx="115" cy="172" r="24" fill="#D25400"/><circle class="pupil" cx="115" cy="172" r="9"/></g>
+          <g class="eye r"><circle cx="205" cy="172" r="24" fill="#D25400"/><circle class="pupil" cx="205" cy="172" r="9"/></g>
+          <rect x="128" y="222" width="64" height="10" rx="5" fill="#D25400"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="domain">janbot.ai &nbsp;·&nbsp; Janbot™ · © 2026 Janbot Industries. All Rights Reserved.</div>
+    <div class="hero-body">
+      <p class="hero-kicker rise" style="animation-delay:.05s">On-device AI agent · macOS 14+ · Apple Silicon</p>
+      <h1>
+        <span class="word" style="--d:.10s"><span>An</span></span>
+        <span class="word" style="--d:.17s"><span>agent</span></span>
+        <span class="word" style="--d:.24s"><span>on</span></span>
+        <span class="word" style="--d:.31s"><span>your</span></span>
+        <span class="nowrap"><span class="word" style="--d:.38s"><span>Mac.</span></span> <span class="hh"><span class="hh-type">With&nbsp;hands.</span></span></span>
+      </h1>
+      <p class="hero-sub rise" style="animation-delay:.24s">
+        Janbot reads your documents, runs commands, searches the web, remembers what
+        matters, and repeats on a schedule. It all runs <span class="mark">on your Mac</span>,
+        and nothing leaves unless you choose a cloud model.
+      </p>
+      <div class="hero-ctas rise" style="animation-delay:.34s">
+        <a class="pill pill-ink" href="janbot-latest.dmg" download>Download for Mac</a>
+        <a class="pill pill-line" href="docs.html">Read the docs</a>
+      </div>
+      <p class="hero-fine rise" style="animation-delay:.42s">free · ~29 MB · no account · no meter</p>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker" aria-label="Janbot in six claims">
+  <div class="ticker-track">
+    <div class="ticker-set">
+      <span>Native on Apple Silicon</span><i>◆</i>
+      <span>Runs 100% offline</span><i>◆</i>
+      <span>Any model, local or cloud</span><i>◆</i>
+      <span>21 built-in tools + MCP</span><i>◆</i>
+      <span>Asks before it writes</span><i>◆</i>
+      <span>Scheduled runs while you sleep</span><i>◆</i>
+    </div>
+    <div class="ticker-set" aria-hidden="true">
+      <span>Native on Apple Silicon</span><i>◆</i>
+      <span>Runs 100% offline</span><i>◆</i>
+      <span>Any model, local or cloud</span><i>◆</i>
+      <span>21 built-in tools + MCP</span><i>◆</i>
+      <span>Asks before it writes</span><i>◆</i>
+      <span>Scheduled runs while you sleep</span><i>◆</i>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ═══ THE PROBLEM ═══ -->
+  <section class="block" id="problem">
+    <div class="wrap center rev">
+      <span class="chip">✦ The problem</span>
+      <h2>Chatbots talk.<br>Then they forget you.</h2>
+      <p class="statement-sub">
+        The assistants you rent live in someone else's building. They can't open
+        your files, they start every day from zero, and your context rides to
+        their servers with every question.
+      </p>
+    </div>
+
+    <div class="wrap">
+      <div class="grid-frame rev">
+        <div class="cell cell-radar">
+          <svg class="radar" viewBox="0 0 300 300" role="img" aria-label="Radar diagram: your context pinging a distant data center">
+            <circle class="ring" cx="150" cy="150" r="130"/>
+            <circle class="ring" cx="150" cy="150" r="92"/>
+            <circle class="ring" cx="150" cy="150" r="54"/>
+            <line class="tick" x1="150" y1="14" x2="150" y2="26"/>
+            <line class="tick" x1="150" y1="274" x2="150" y2="286"/>
+            <line class="tick" x1="14" y1="150" x2="26" y2="150"/>
+            <line class="tick" x1="274" y1="150" x2="286" y2="150"/>
+            <g class="sweep">
+              <path class="sweep-wedge" d="M150 150 L280 150 A130 130 0 0 0 266.8 93 Z"/>
+              <line class="sweep-arm" x1="150" y1="150" x2="280" y2="150"/>
+            </g>
+            <line class="leak" x1="156" y1="144" x2="230" y2="82"/>
+            <circle class="halo" cx="150" cy="150" r="6"/>
+            <circle class="dot core" cx="150" cy="150" r="5"/>
+            <text x="150" y="176" text-anchor="middle">YOUR CONTEXT</text>
+            <circle class="dot node-remote" cx="236" cy="76" r="3"/>
+            <text x="236" y="60" text-anchor="middle">THEIR SERVERS</text>
+          </svg>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker">No hands</span>
+          <h3>They can't touch your work.</h3>
+          <p>A browser tab can't open your spreadsheet, run a command, or file the report where it belongs.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker">Data commute</span>
+          <h3>Your documents ride to the cloud.</h3>
+          <p>Every question ships your context to infrastructure you don't control and can't inspect.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker">Goldfish memory</span>
+          <h3>Every chat starts from zero.</h3>
+          <p>Yesterday's decisions are gone. You re-introduce yourself, your files, and your preferences, every single day.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker">The meter</span>
+          <h3>You pay per thought.</h3>
+          <p>Token bills scale with your curiosity. The meter decides when the work stops.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INTRODUCING ═══ -->
+  <section class="block" id="intro">
+    <div class="wrap center rev">
+      <span class="chip">✓ Introducing Janbot</span>
+      <h2>Everything local.<br>An agent in residence.</h2>
+      <p class="statement-sub">
+        Janbot is a native Mac app that lives in your menu bar. It keeps its
+        memory, its schedule, and your data on your machine, and it does the
+        work with real tools instead of just words.
+      </p>
+    </div>
+
+    <div class="wrap">
+      <div class="blueprint-wrap rev">
+        <div class="blueprint-head">
+          <span>Fig. 01 · One task, end to end</span>
+          <span>All wires local</span>
+        </div>
+        <svg class="blueprint" viewBox="0 0 940 360" role="img" aria-label="Blueprint diagram: your task flows into Janbot's local inference, which works through files, shell, web, and memory tools, and returns finished work. The wire to the cloud is optional; there is no wire for telemetry.">
+          <!-- cloud, optional -->
+          <rect class="box" x="410" y="18" width="120" height="40"/>
+          <text class="label" x="470" y="38" text-anchor="middle">CLOUD</text>
+          <text class="label-sub" x="470" y="50" text-anchor="middle">OPT-IN ONLY</text>
+          <line class="wire wire-dead" x1="470" y1="58" x2="470" y2="110"/>
+
+          <!-- telemetry, severed -->
+          <rect class="box" x="700" y="18" width="150" height="40"/>
+          <text class="label label-dead" x="775" y="38" text-anchor="middle">TELEMETRY</text>
+          <text class="label-sub" x="775" y="50" text-anchor="middle">NO WIRE EXISTS</text>
+          <line class="wire wire-dead" x1="775" y1="58" x2="775" y2="86"/>
+          <line class="cross" x1="768" y1="79" x2="782" y2="93"/>
+          <line class="cross" x1="782" y1="79" x2="768" y2="93"/>
+
+          <!-- main flow -->
+          <rect class="box" x="40" y="130" width="170" height="60"/>
+          <text class="label" x="125" y="156" text-anchor="middle">YOUR TASK</text>
+          <text class="label-sub" x="125" y="172" text-anchor="middle">"REPORT, EVERY MONDAY"</text>
+
+          <line class="wire" x1="210" y1="160" x2="330" y2="160"/>
+          <path class="wire" d="M322 155 L332 160 L322 165"/>
+
+          <rect class="box box-hot" x="332" y="110" width="276" height="100"/>
+          <text class="label label-hot" x="470" y="150" text-anchor="middle">JANBOT</text>
+          <text class="label-sub" x="470" y="168" text-anchor="middle">LOCAL INFERENCE · REACT LOOP · 45 ROUNDS</text>
+          <text class="label-sub" x="470" y="184" text-anchor="middle">APPROVAL GATES · SEATBELT SANDBOX</text>
+
+          <line class="wire" x1="608" y1="160" x2="728" y2="160"/>
+          <path class="wire" d="M720 155 L730 160 L720 165"/>
+
+          <rect class="box" x="730" y="130" width="170" height="60"/>
+          <text class="label" x="815" y="156" text-anchor="middle">WORK, DONE</text>
+          <text class="label-sub" x="815" y="172" text-anchor="middle">REPORTS/Q3-SUMMARY.MD</text>
+
+          <!-- the hands -->
+          <line class="wire" x1="470" y1="210" x2="470" y2="248"/>
+          <line class="wire" x1="150" y1="248" x2="790" y2="248"/>
+          <line class="wire" x1="150" y1="248" x2="150" y2="272"/>
+          <line class="wire" x1="363" y1="248" x2="363" y2="272"/>
+          <line class="wire" x1="577" y1="248" x2="577" y2="272"/>
+          <line class="wire" x1="790" y1="248" x2="790" y2="272"/>
+
+          <rect class="box" x="75" y="272" width="150" height="48"/>
+          <text class="label" x="150" y="293" text-anchor="middle">FILES</text>
+          <text class="label-sub" x="150" y="308" text-anchor="middle">READ · EDIT · CREATE</text>
+
+          <rect class="box" x="288" y="272" width="150" height="48"/>
+          <text class="label" x="363" y="293" text-anchor="middle">SHELL</text>
+          <text class="label-sub" x="363" y="308" text-anchor="middle">SANDBOXED BASH</text>
+
+          <rect class="box" x="502" y="272" width="150" height="48"/>
+          <text class="label" x="577" y="293" text-anchor="middle">WEB</text>
+          <text class="label-sub" x="577" y="308" text-anchor="middle">SEARCH · FETCH · BROWSE</text>
+
+          <rect class="box" x="715" y="272" width="150" height="48"/>
+          <text class="label" x="790" y="293" text-anchor="middle">MEMORY</text>
+          <text class="label-sub" x="790" y="308" text-anchor="middle">ON-DEVICE INDEX</text>
+
+          <!-- live energy tracing every local wire, forward -->
+          <path class="flow" d="M210 160 H330 M608 160 H730 M470 210 V248 M150 248 H790 M150 248 V272 M363 248 V272 M577 248 V272 M790 248 V272"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ THE LOOP / RUN LOG ═══ -->
+  <section class="block" id="loop">
+    <div class="wrap center rev">
+      <span class="chip">▣ The loop</span>
+      <h2>Rounds, not replies.</h2>
+      <p class="statement-sub">
+        Janbot thinks, uses a tool, then looks at the result, up to 45 rounds on
+        a single task. When a step fails, it reads the error and takes another
+        path. And when it wants to touch your world, it stops and asks.
+      </p>
+    </div>
+
+    <div class="wrap">
+      <div class="runlog-stage" id="loopStage">
+        <div class="runlog-sticky">
+          <div class="runlog" id="runlog" role="img" aria-label="A run log: you ask for a weekly invoice summary; Janbot reads the spreadsheet, checks an exchange rate, notices a discrepancy and rereads, pauses at an approval gate before writing the report, schedules the Monday run, and finishes.">
+            <div class="runlog-head">
+              <span>RUN 0142 · <b>qwen3-30b-a3b</b> · LOCAL</span>
+              <span class="rl-meta">round <b id="rlRound">0</b>/9 · <span id="rlTime">0.0s</span></span>
+              <span class="rl-status"><i class="rl-dot"></i><span id="rlStatusText">RUNNING</span></span>
+            </div>
+            <div class="runlog-rows">
+              <p class="lrow lrow-user"><span class="st">›</span><span>you · "Keep an eye on Q3 invoices. Send me a summary every Monday."</span></p>
+              <p class="lrow"><span class="st st-ok">✓</span><span><span class="tool">read_document</span> · Invoices/2026-Q3.xlsx · 214 rows</span></p>
+              <p class="lrow"><span class="st st-ok">✓</span><span><span class="tool">web_search</span> · "ECB EUR/USD reference rate July 2026"</span></p>
+              <p class="lrow"><span class="st">·</span><span>observe · sheet 2 totals off by 4.2%, rereading with corrections</span></p>
+              <p class="lrow"><span class="st st-ok">✓</span><span><span class="tool">read_document</span> · Invoices/2026-Q3.xlsx · sheet 2</span></p>
+              <p class="lrow lrow-gate"><span class="st">■</span><span><span class="gate-chip">Approval</span><span class="tool">write_file</span> · Reports/q3-summary.md · +38 lines&ensp;<span class="gate-ok">✓ allowed</span></span></p>
+              <p class="lrow"><span class="st st-ok">✓</span><span><span class="tool">manage_workflow</span> · weekly MON 09:00 → Telegram</span></p>
+              <p class="lrow"><span class="st st-ok">✓</span><span><span class="tool">store_memory</span> · "invoice sheets: corrections live on sheet 2"</span></p>
+              <p class="lrow lrow-done"><span class="st st-ok">✓</span><span><span class="tool">respond</span> · run complete · 9 rounds · 14 tool calls · 0 bytes left this Mac</span></p>
+            </div>
+            <div class="rl-bar"><i id="rlBar"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CAPABILITIES ═══ -->
+  <section class="block" id="capabilities">
+    <div class="wrap center rev">
+      <span class="chip">◆ The toolkit</span>
+      <h2>Built to finish, not to chat.</h2>
+    </div>
+    <div class="wrap">
+      <div class="six rev">
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>Tools</span>
+          <h3>Twenty-one, built in.</h3>
+          <p><span class="m">read_document · bash · web_search · edit_file · create_document …</span><br>PDF, Excel, Word, and PowerPoint parsed natively. Markdown in, .docx out.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>MCP</span>
+          <h3>Every server you plug in.</h3>
+          <p>Linear, Spark, your own. Janbot discovers tools on demand with <span class="m">tool_search → activate_tools</span>, instead of drowning in schemas.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>Memory</span>
+          <h3>It remembers on purpose.</h3>
+          <p>A structured wiki with hybrid keyword + vector recall. Embeddings run on-device, so nothing is sent away to be remembered.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>Safety</span>
+          <h3>It asks before it acts.</h3>
+          <p>Writes, edits, and shell pause for your approval. Bash runs inside macOS Seatbelt with the network off by default.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>Schedules</span>
+          <h3>Monday, 09:00, every week.</h3>
+          <p>Cron-style tasks and standing goals it checks on over time. Some work shouldn't wait for you to remember it.</p>
+        </div>
+        <div class="cell">
+          <span class="cell-kicker"><span class="dia">◆</span>Connectors</span>
+          <h3>Reach it from anywhere.</h3>
+          <p>Telegram and Slack, both ways. Results arrive where you are, so the report lands in your pocket instead of a tab.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ OFFLINE ═══ -->
+  <section class="block" id="offline">
+    <div class="wrap">
+      <div class="offline-art rev">
+        <svg class="radar" viewBox="0 0 300 300" style="max-width:100%" role="img" aria-label="Radar diagram: your machine at the center, with no outbound connections">
+          <circle class="ring" cx="150" cy="150" r="130"/>
+          <circle class="ring" cx="150" cy="150" r="92"/>
+          <circle class="ring" cx="150" cy="150" r="54"/>
+          <line class="tick" x1="150" y1="14" x2="150" y2="26"/>
+          <line class="tick" x1="150" y1="274" x2="150" y2="286"/>
+          <line class="tick" x1="14" y1="150" x2="26" y2="150"/>
+          <line class="tick" x1="274" y1="150" x2="286" y2="150"/>
+          <g class="sweep">
+            <path class="sweep-wedge" d="M150 150 L280 150 A130 130 0 0 0 266.8 93 Z"/>
+            <line class="sweep-arm" x1="150" y1="150" x2="280" y2="150"/>
+          </g>
+          <circle class="halo" cx="150" cy="150" r="6"/>
+          <circle class="dot core" cx="150" cy="150" r="5"/>
+          <text x="150" y="176" text-anchor="middle">YOUR MACHINE</text>
+          <text x="150" y="112" text-anchor="middle" opacity="0.6">MODEL · MEMORY · TOOLS</text>
+          <text x="236" y="60" text-anchor="middle" opacity="0.45">NO OUTBOUND</text>
+        </svg>
+      </div>
+      <div class="rev">
+        <span class="chip">⌀ Offline</span>
+        <h2>Pull the plug.<br>It keeps working.</h2>
+        <p class="body-copy">
+          Flights, dead Wi-Fi, a cabin somewhere. With a local model from LM Studio
+          or Ollama, a complete agent run makes zero network calls. Inference,
+          memory, and embeddings all happen on your hardware.
+        </p>
+        <p class="body-copy">
+          Everything it knows lives in one file you can open:
+        </p>
+        <span class="db-path">~/Library/Application Support/Janbot/janbot.db</span>
+        <div class="providers">
+          <span class="providers-label">Bring whichever mind you like</span>
+          <div class="prov-row">
+            <span class="prov-tag">Local</span>
+            <span class="pchip">LM Studio</span>
+            <span class="pchip">Ollama</span>
+            <span class="pchip">vLLM</span>
+            <span class="pchip">llama.cpp</span>
+          </div>
+          <div class="prov-row">
+            <span class="prov-tag">Hosted</span>
+            <span class="pchip">Claude</span>
+            <span class="pchip">Hugging Face</span>
+            <span class="pchip">OpenRouter</span>
+          </div>
+          <p class="prov-note">…or <b>any OpenAI-compatible API</b>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ APPROACH ═══ -->
+  <section class="block center" id="approach">
+    <div class="wrap rev">
+      <span class="chip">▲ Our approach</span>
+      <h2>Hands beat size.</h2>
+      <p class="statement-sub">
+        A small model that can read your files, run your commands, and check its
+        own work beats a giant that can only talk. Janbot budgets every round to
+        the model you give it, and an 8&nbsp;GB Mac is enough to start.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═══ -->
+  <section id="cta">
+    <div class="cta-panel">
+    <svg class="cta-stamp" viewBox="0 0 320 320" aria-hidden="true">
+      <g fill="none" stroke="#D25400" stroke-width="10">
+        <rect x="40" y="80" width="240" height="200" rx="48"/>
+        <line x1="160" y1="80" x2="160" y2="34" stroke-linecap="round"/>
+      </g>
+      <circle cx="160" cy="28" r="16" fill="#D25400"/>
+      <circle cx="115" cy="172" r="24" fill="#D25400"/>
+      <circle cx="205" cy="172" r="24" fill="#D25400"/>
+      <rect x="128" y="222" width="64" height="10" rx="5" fill="#D25400"/>
+    </svg>
+    <div class="wrap">
+      <div class="rev">
+        <h2>Hand something off.</h2>
+        <p class="cta-sub">
+          Download Janbot, point it at LM Studio or Ollama, or paste a Claude
+          key, and give it a job you're tired of doing.
+        </p>
+        <div class="hero-ctas">
+          <a class="pill pill-ink" href="janbot-latest.dmg" download>Download for Mac</a>
+          <a class="pill pill-line" href="docs.html">Read the docs</a>
+        </div>
+        <p class="hero-fine">janbot-latest.dmg · ~29 MB · unsigned preview · right-click Janbot.app → Open on first launch only</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-sign rev">
+    <p class="foot-status">
+      <span class="foot-dot" aria-hidden="true"></span>
+      <b>Running locally</b>&ensp;·&ensp;0 bytes sent&ensp;·&ensp;everything on this Mac
+    </p>
+    <a class="foot-mark" href="#hero" aria-label="Back to top">
+      <svg class="foot-glyph" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="8" width="26" height="21" rx="6" fill="none" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="16" y1="8" x2="16" y2="3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <circle class="fb" cx="16" cy="2.6" r="2.2" fill="var(--orange)"/>
+        <circle class="fe" cx="11" cy="18" r="2.6" fill="currentColor"/>
+        <circle class="fe" cx="21" cy="18" r="2.6" fill="currentColor"/>
+      </svg>
+      <span class="foot-word" aria-hidden="true"><span>J</span><span>A</span><span>N</span><span>B</span><span>O</span><span>T</span></span>
+    </a>
+  </div>
+
+  <div class="foot">
+    <span>© 2026 Janbot</span>
+    <span class="foot-egg" title="Began life as a Dutch swearing bot.">Built by bots, for people.<span class="egg">&ensp;Godverdomme.</span></span>
+    <div class="foot-links">
+      <a href="docs.html">Docs</a>
+      <a href="janbot-latest.dmg" download>Download</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var revEls = document.querySelectorAll('.rev');
+    if (reduce || !('IntersectionObserver' in window)) {
+      revEls.forEach(function (el) { el.classList.add('in'); });
+    } else {
+      var reveal = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          en.target.classList.add('in');
+          reveal.unobserve(en.target);
+        });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
+      revEls.forEach(function (el) { reveal.observe(el); });
+    }
+
+    /* ── Hero: type the payoff phrase behind a caret ── */
+    var hh = document.querySelector('.hh');
+    var hhType = document.querySelector('.hh-type');
+    if (hh && hhType) {
+      var full = hhType.textContent;             // "With hands." (with nbsp)
+      if (reduce) {
+        hh.classList.add('done');
+      } else {
+        hhType.textContent = '';
+        var ci = 0;
+        var typeStart = setTimeout(function tick() {
+          hhType.textContent = full.slice(0, ++ci);
+          if (ci < full.length) {
+            setTimeout(tick, 62 + (full[ci - 1] === ' ' ? 90 : 0));
+          } else {
+            setTimeout(function () { hh.classList.add('done'); }, 900);
+          }
+        }, 1150);                                 // wait for the words to finish rising
+      }
+    }
+
+    /* ── Hero: depth parallax + eye-tracking + spotlight + live tools ── */
+    var heroPanel = document.querySelector('.hero-panel');
+    if (heroPanel && !reduce && matchMedia('(pointer: fine)').matches) {
+      var layers = [].slice.call(heroPanel.querySelectorAll('.scene-layer'));
+      var pupils = [].slice.call(heroPanel.querySelectorAll('.pupil'));
+      var toks   = [].slice.call(heroPanel.querySelectorAll('.tok'));
+      var px = 0, py = 0, tx = 0, ty = 0, mx = 0, my = 0, rafId = null;
+
+      function measure() {
+        toks.forEach(function (t) {
+          var r = t.getBoundingClientRect();
+          t._cx = r.left + r.width / 2;
+          t._cy = r.top + r.height / 2;
+        });
+      }
+      measure();
+      addEventListener('resize', measure);
+
+      heroPanel.addEventListener('pointermove', function (e) {
+        var r = heroPanel.getBoundingClientRect();
+        mx = e.clientX - r.left; my = e.clientY - r.top;
+        tx = (mx / r.width - 0.5) * 2;    // -1..1
+        ty = (my / r.height - 0.5) * 2;
+        heroPanel.style.setProperty('--mx', mx + 'px');
+        heroPanel.style.setProperty('--my', my + 'px');
+        // light up whichever tool the cursor is near
+        for (var i = 0; i < toks.length; i++) {
+          var dx = e.clientX - toks[i]._cx, dy = e.clientY - toks[i]._cy;
+          toks[i].classList.toggle('near', dx * dx + dy * dy < 150 * 150);
+        }
+        if (!rafId) rafId = requestAnimationFrame(glide);
+      });
+      heroPanel.addEventListener('pointerleave', function () {
+        tx = 0; ty = 0;
+        toks.forEach(function (t) { t.classList.remove('near'); });
+        if (!rafId) rafId = requestAnimationFrame(glide);
+      });
+
+      function glide() {
+        px += (tx - px) * 0.09;
+        py += (ty - py) * 0.09;
+        layers.forEach(function (l) {
+          var d = parseFloat(l.getAttribute('data-depth')) || 1;
+          l.style.transform = 'translate3d(' + (px * 24 * d).toFixed(2) + 'px,' +
+                              (py * 20 * d).toFixed(2) + 'px, 0)';
+        });
+        // pupils lean toward the cursor, clamped inside the sockets
+        var ox = (px * 7).toFixed(2), oy = (py * 6).toFixed(2);
+        pupils.forEach(function (p) { p.style.transform = 'translate(' + ox + 'px,' + oy + 'px)'; });
+        if (Math.abs(tx - px) > 0.001 || Math.abs(ty - py) > 0.001) {
+          rafId = requestAnimationFrame(glide);
+        } else { rafId = null; }
+      }
+    }
+
+    /* ── Run log: scroll-scrubbed typewriter ──────────────────────────
+       The number of characters typed is a pure function of how far the
+       sticky stage has scrolled, so scrolling down types the run out and
+       scrolling back up un-types it, 1:1 with the wheel. ---------------- */
+    var stage = document.getElementById('loopStage');
+    var log = document.getElementById('runlog');
+    if (!stage || !log) return;
+
+    var RunLog = {
+      rows: [].slice.call(log.querySelectorAll('.lrow')),
+      bar: document.getElementById('rlBar'),
+      statusText: document.getElementById('rlStatusText'),
+      roundEl: document.getElementById('rlRound'),
+      timeEl: document.getElementById('rlTime'),
+      ENTER: 0.14,   // stage fraction over which the intro zoom completes
+      START: 0.20,   // stage fraction before the first character appears
+      END: 0.94,     // stage fraction by which the last character is typed
+      total: 0,      // grand total of characters across every row
+      ticking: false,
+
+      // Copy the first `remaining` characters of a template node into a
+      // destination, cloning any element wrappers so markup is preserved.
+      fill: function (destParent, srcParent, remaining) {
+        var used = 0, kids = srcParent.childNodes;
+        for (var i = 0; i < kids.length && used < remaining; i++) {
+          var node = kids[i];
+          if (node.nodeType === 3) {
+            var take = Math.min(node.nodeValue.length, remaining - used);
+            destParent.appendChild(document.createTextNode(node.nodeValue.slice(0, take)));
+            used += take;
+          } else if (node.nodeType === 1) {
+            var clone = node.cloneNode(false);
+            destParent.appendChild(clone);
+            used += this.fill(clone, node, remaining - used);
+          }
+        }
+        return used;
+      },
+
+      // Show exactly `k` characters of a row, skipping redundant repaints.
+      type: function (row, k) {
+        if (row._shown === k) return;
+        row._shown = k;
+        row._dest.textContent = '';
+        this.fill(row._dest, row._tpl, k);
+      },
+
+      // Raw 0..1 scroll position through the sticky stage.
+      rawProgress: function () {
+        var rect = stage.getBoundingClientRect();
+        var dist = rect.height - window.innerHeight;
+        var p = dist > 0 ? (-rect.top) / dist : 0;
+        return p < 0 ? 0 : p > 1 ? 1 : p;
+      },
+
+      // Spread `chars` across the rows; returns how many rows are complete.
+      paint: function (chars) {
+        var acc = 0, completed = 0;
+        for (var i = 0; i < this.rows.length; i++) {
+          var r = this.rows[i], t = r._total;
+          var k = chars - acc;
+          if (k < 0) k = 0; else if (k > t) k = t;
+          this.type(r, k);
+          r.classList.toggle('show', k > 0);
+          r.classList.toggle('active', k > 0 && k < t);
+          if (k >= t) completed++;
+          acc += t;
+        }
+        return completed;
+      },
+
+      render: function () {
+        this.ticking = false;
+        var p = this.rawProgress();
+
+        // Intro zoom: plays once as the terminal enters, then holds static.
+        var enter = Math.min(1, p / this.ENTER);
+        var ez = 1 - Math.pow(1 - enter, 3);           // easeOutCubic
+        var scale = 0.9 + 0.1 * ez;
+        var tilt = (1 - ez) * 6;                        // deg, flattens to 0
+        log.style.transform = 'scale(' + scale.toFixed(4) + ') rotateX(' + tilt.toFixed(2) + 'deg)';
+        log.style.opacity = (0.5 + 0.5 * Math.min(1, p / (this.ENTER * 0.6))).toFixed(3);
+
+        // Typing scrub: characters map 1:1 to scroll across the type band.
+        var local = (p - this.START) / (this.END - this.START);
+        local = local < 0 ? 0 : local > 1 ? 1 : local;
+        var chars = Math.round(local * this.total);
+        var completed = this.paint(chars);
+        var done = chars >= this.total;
+
+        log.classList.toggle('live', local > 0 && !done);
+        log.classList.toggle('done', done);
+        if (this.bar) this.bar.style.width = (local * 100).toFixed(2) + '%';
+        if (this.statusText) this.statusText.textContent = done ? 'DONE' : 'RUNNING';
+        if (this.roundEl) this.roundEl.textContent = done ? '9' : Math.max(0, Math.min(9, completed));
+        if (this.timeEl) this.timeEl.textContent = (local * 4.2).toFixed(1) + 's';
+      },
+
+      onScroll: function () {
+        if (this.ticking) return;
+        this.ticking = true;
+        var self = this;
+        requestAnimationFrame(function () { self.render(); });
+      },
+
+      init: function (reduce) {
+        var self = this;
+        this.rows.forEach(function (r) {
+          var dest = r.children[r.children.length - 1];
+          r._dest = dest;
+          r._tpl = dest.cloneNode(true);
+          r._total = dest.textContent.length;
+          r._shown = -1;
+          self.total += r._total;
+        });
+
+        if (reduce) {
+          this.rows.forEach(function (r) { self.type(r, r._total); r.classList.add('show'); });
+          log.classList.add('done');
+          if (this.statusText) this.statusText.textContent = 'DONE';
+          if (this.roundEl) this.roundEl.textContent = '9';
+          if (this.timeEl) this.timeEl.textContent = '4.2s';
+          if (this.bar) this.bar.style.width = '100%';
+          return;
+        }
+
+        var handler = function () { self.onScroll(); };
+        addEventListener('scroll', handler, { passive: true });
+        addEventListener('resize', handler);
+        this.render();
+      }
+    };
+
+    // Expose for automated verification.
+    window.__runlog = RunLog;
+    RunLog.init(reduce);
+  })();
+</script>
+
 </body>
 </html>

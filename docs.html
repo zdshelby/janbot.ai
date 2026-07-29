@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs · Janbot</title>
+<meta name="description" content="Help for Janbot, the on-device AI agent for Mac. Install, onboarding, chat, models, safety, connectors, MCP, tasks, skills, memory, privacy, and troubleshooting.">
+<meta property="og:title" content="Janbot Docs">
+<meta property="og:description" content="Everything you need to install Janbot, connect a model, and hand off real work, with your data on your Mac.">
+<meta property="og:url" content="https://janbot.ai/docs.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..750&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  :root {
+    --orange:     #FF6A00;
+    --orange-deep:#D25400;
+    --ink:        #131110;
+    --coal:       #121212;
+    --coal-2:     #161616;
+    --coal-3:     #1b1b1b;
+    --bone:       #F0EBE1;
+    --bone-2:     rgba(240, 235, 225, 0.64);
+    --bone-3:     rgba(240, 235, 225, 0.38);
+    --line:       rgba(240, 235, 225, 0.14);
+    --line-soft:  rgba(240, 235, 225, 0.08);
+    --cream:      #EFE8DA;
+    --ok:         #7FB88D;
+    --warn:       #E8B25A;
+    --danger:     #E0705A;
+
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Fragment Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+    --ease: cubic-bezier(0.33, 0, 0.15, 1);
+    --focus-ring: 0 0 0 3px rgba(255, 106, 0, 0.5);
+    --frame: clamp(10px, 1.6vw, 18px);
+    --nav-h: 61px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--coal);
+    color: var(--bone);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  ::selection { background: rgba(255, 106, 0, 0.35); }
+  a { color: inherit; }
+  :where(a, button):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 6px;
+  }
+  .mono { font-family: var(--mono); }
+
+  .skip {
+    position: absolute; left: -9999px; top: 12px; z-index: 1000;
+    background: var(--ink); color: var(--cream);
+    padding: 8px 14px; border-radius: 999px; font-weight: 600; text-decoration: none;
+  }
+  .skip:focus { left: 12px; }
+
+  /* ── Pills (shared with home) ── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; text-decoration: none;
+    padding: 11px 22px; border-radius: 999px;
+    transition: transform 0.18s var(--ease), background 0.18s var(--ease),
+                color 0.18s var(--ease), border-color 0.18s var(--ease);
+    white-space: nowrap;
+  }
+  .pill:hover { transform: translateY(-1px); }
+  .pill-hot { background: var(--orange); color: var(--ink); }
+  .pill-hot:hover { background: #FF7D1F; }
+  .pill-ink { background: var(--ink); color: var(--cream); border: 1px solid var(--line); }
+  .pill-ink:hover { background: #000; }
+  .pill-line { border: 1.5px solid var(--line); color: var(--bone); }
+  .pill-line:hover { border-color: rgba(255,106,0,.6); background: rgba(255,106,0,.05); }
+
+  /* ── Top nav (sticky) ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px clamp(20px, 4vw, 44px);
+    background: rgba(18, 18, 18, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--bone);
+  }
+  .top-nav .plain {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; text-decoration: none; color: var(--bone-2);
+  }
+  .top-nav .plain:hover { color: var(--bone); }
+  .top-nav .plain.active { color: var(--orange); }
+  .hero-nav-links { display: flex; align-items: center; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--bone); }
+  .brand-glyph { width: 26px; height: 26px; display: block; }
+  .brand-glyph .bd { fill: var(--orange); }
+  .brand-mark { font-family: var(--mono); font-weight: 400; font-size: 15px; letter-spacing: 0.22em; }
+
+  /* mobile TOC toggle */
+  .toc-toggle {
+    display: none;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bone-2); background: var(--coal-2); border: 1px solid var(--line);
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  }
+
+  /* ═══════════ Docs shell ═══════════ */
+  .docs-shell {
+    max-width: 1240px; margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 44px);
+    display: grid;
+    grid-template-columns: 244px minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+  }
+
+  /* left rail */
+  .docs-nav {
+    position: sticky;
+    top: var(--nav-h);
+    max-height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    padding: 34px 0 60px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .docs-nav::-webkit-scrollbar { width: 6px; }
+  .docs-nav::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+  .toc-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--bone-3);
+    padding: 0 0 6px 14px; margin-top: 22px; display: block;
+  }
+  .toc-label:first-child { margin-top: 0; }
+  .docs-nav a {
+    display: block; text-decoration: none;
+    font-size: 13.5px; color: var(--bone-2); line-height: 1.4;
+    padding: 6px 14px; border-left: 2px solid transparent;
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .docs-nav a:hover { color: var(--bone); }
+  .docs-nav a.active {
+    color: var(--orange); border-left-color: var(--orange);
+    background: rgba(255,106,0,.05);
+  }
+
+  /* main column */
+  .docs-main {
+    padding: 34px 0 120px;
+    max-width: 760px;
+    min-width: 0;
+  }
+
+  /* ── Docs page header ── */
+  .docs-hero {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(255,106,0,.10), transparent 55%),
+      var(--coal-2);
+    padding: clamp(26px, 4vw, 44px);
+    margin-bottom: clamp(40px, 6vh, 72px);
+  }
+  .docs-kicker {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 16px;
+  }
+  .docs-hero h1 {
+    font-weight: 640; font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.02; letter-spacing: -0.03em; margin-bottom: 16px;
+  }
+  .docs-hero p { color: var(--bone-2); max-width: 56ch; font-size: clamp(15.5px, 1.7vw, 18px); }
+  .docs-hero .hero-fine {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em;
+    color: var(--bone-3); margin-top: 20px;
+  }
+
+  /* ── Section machinery ── */
+  section.doc { scroll-margin-top: calc(var(--nav-h) + 24px); padding-top: 8px; margin-bottom: clamp(52px, 8vh, 96px); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--orange);
+    border: 1px solid rgba(255, 106, 0, 0.4);
+    padding: 7px 14px; margin-bottom: 22px; border-radius: 4px;
+  }
+  h2 {
+    font-weight: 620; font-size: clamp(28px, 3.6vw, 40px);
+    line-height: 1.06; letter-spacing: -0.025em; margin-bottom: 14px;
+  }
+  h3 {
+    font-weight: 620; font-size: clamp(18px, 2vw, 22px);
+    letter-spacing: -0.015em; line-height: 1.2;
+    margin: 38px 0 12px;
+  }
+  .doc p { color: var(--bone-2); margin: 0 0 16px; }
+  .doc p a, .doc li a { color: var(--orange); text-decoration: none; border-bottom: 1px solid rgba(255,106,0,.35); }
+  .doc p a:hover, .doc li a:hover { border-bottom-color: var(--orange); }
+  .doc strong { color: var(--bone); font-weight: 620; }
+  .lead { font-size: clamp(16px, 1.8vw, 18.5px); color: var(--bone-2); max-width: 60ch; }
+
+  /* inline code / paths / UI labels */
+  code, .path, .kbd {
+    font-family: var(--mono); font-size: 0.86em;
+    background: var(--coal-3); color: var(--bone);
+    border: 1px solid var(--line-soft); border-radius: 5px;
+    padding: 0.12em 0.42em; overflow-wrap: anywhere;
+  }
+  .ui {
+    font-family: var(--mono); font-size: 0.84em; letter-spacing: 0.02em;
+    color: var(--orange); white-space: nowrap;
+  }
+  .path-block {
+    display: block; font-family: var(--mono); font-size: 12.5px;
+    color: var(--bone-2); background: var(--coal-2);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 16px; margin: 4px 0 20px; overflow-wrap: anywhere;
+  }
+
+  /* lists */
+  .doc ul, .doc ol { margin: 0 0 18px; padding-left: 0; list-style: none; }
+  .doc ul li, .doc ol li { position: relative; padding-left: 26px; margin-bottom: 9px; color: var(--bone-2); }
+  .doc ul li::before {
+    content: '◆'; position: absolute; left: 4px; top: 0;
+    color: var(--orange); font-size: 9px; top: 0.45em;
+  }
+  .doc ol { counter-reset: step; }
+  .doc ol li { counter-increment: step; }
+  .doc ol li::before {
+    content: counter(step); position: absolute; left: 0; top: 0.1em;
+    font-family: var(--mono); font-size: 11px; color: var(--orange);
+    border: 1px solid rgba(255,106,0,.4); border-radius: 50%;
+    width: 19px; height: 19px; display: grid; place-items: center; line-height: 1;
+  }
+  .doc ol li { padding-left: 32px; margin-bottom: 12px; }
+
+  /* ── Callouts ── */
+  .note {
+    border: 1px solid var(--line); border-left: 3px solid var(--orange);
+    background: rgba(255,106,0,.04); border-radius: 0 8px 8px 0;
+    padding: 16px 20px; margin: 4px 0 24px;
+  }
+  .note.warn { border-left-color: var(--warn); background: rgba(232,178,90,.05); }
+  .note.danger { border-left-color: var(--danger); background: rgba(224,112,90,.06); }
+  .note.ok { border-left-color: var(--ok); background: rgba(127,184,141,.05); }
+  .note .note-label {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange); display: block; margin-bottom: 6px;
+  }
+  .note.warn .note-label { color: var(--warn); }
+  .note.danger .note-label { color: var(--danger); }
+  .note.ok .note-label { color: var(--ok); }
+  .note p { margin: 0; color: var(--bone-2); font-size: 14.5px; }
+  .note p + p { margin-top: 8px; }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 4px 0 24px; border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td {
+    text-align: left; padding: 11px 16px;
+    border-bottom: 1px solid var(--line-soft); vertical-align: top;
+  }
+  thead th {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--bone-3); font-weight: 400;
+    background: var(--coal-2);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(240,235,225,.02); }
+  td { color: var(--bone-2); }
+  td strong, td b { color: var(--bone); font-weight: 600; }
+  td code { font-size: 12px; }
+
+  /* ── Step cards (getting started) ── */
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 4px 0 24px;
+  }
+  .step-card { padding: 20px; border-left: 1px solid var(--line-soft); border-top: 1px solid var(--line-soft); }
+  .step-card:nth-child(-n+4) { border-top: none; }
+  .step-card:first-child { border-left: none; }
+  .step-num {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    color: var(--orange); display: block; margin-bottom: 8px;
+  }
+  .step-card h4 { font-size: 15px; font-weight: 620; margin-bottom: 5px; letter-spacing: -0.01em; }
+  .step-card p { font-size: 13px; color: var(--bone-3); margin: 0; line-height: 1.55; }
+
+  /* ── Cross-links at section foot ── */
+  .seealso {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
+    color: var(--bone-3); border-top: 1px solid var(--line-soft);
+    padding-top: 14px; margin-top: 28px;
+  }
+  .seealso b { color: var(--bone-2); font-weight: 400; text-transform: uppercase; letter-spacing: 0.14em; font-size: 10.5px; margin-right: 8px; }
+  .seealso a { color: var(--bone-2); text-decoration: none; }
+  .seealso a:hover { color: var(--orange); }
+
+  /* ═══════════ FOOTER (shared) ═══════════ */
+  footer {
+    position: relative; background: #0D0D0D; overflow: hidden;
+    border-top: 1px solid var(--line-soft); margin-top: 40px;
+  }
+  footer::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(130% 120% at 50% 118%, #000 18%, transparent 72%);
+            mask-image: radial-gradient(130% 120% at 50% 118%, #000 18%, transparent 72%);
+  }
+  .foot {
+    position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;
+    padding: 30px clamp(20px, 4vw, 44px);
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px;
+  }
+  .foot span, .foot a {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em;
+    color: var(--bone-3); text-decoration: none;
+  }
+  .foot-links { display: flex; gap: 22px; }
+  .foot-links a:hover { color: var(--bone); }
+
+  /* ── Reveal ── */
+  .rev { opacity: 0; transform: translateY(14px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  .rev.in { opacity: 1; transform: none; }
+
+  /* ═══════════ Responsive ═══════════ */
+  @media (max-width: 920px) {
+    .docs-shell { grid-template-columns: 1fr; }
+    .docs-nav {
+      position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0; z-index: 55;
+      max-height: none; background: var(--coal); padding: 20px clamp(20px,4vw,44px) 60px;
+      border-top: 1px solid var(--line-soft);
+      display: none;
+    }
+    .docs-nav.open { display: block; }
+    .toc-toggle { display: inline-block; }
+    .top-nav .plain { display: none; }
+  }
+  @media (max-width: 520px) {
+    .steps-grid { grid-template-columns: 1fr; }
+    .step-card { border-left: none !important; border-top: 1px solid var(--line-soft) !important; }
+    .step-card:first-child { border-top: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#getting-started">Skip to content</a>
+
+<!-- ═══ NAV ═══ -->
+<nav class="top-nav" aria-label="Site">
+  <a class="brand" href="index.html" aria-label="Janbot home">
+    <svg class="brand-glyph" viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="3" y="8" width="26" height="21" rx="6" fill="none" stroke="currentColor" stroke-width="2.4"/>
+      <line x1="16" y1="8" x2="16" y2="3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <circle class="bd" cx="16" cy="2.6" r="2.2"/>
+      <circle cx="11" cy="18" r="2.6" fill="currentColor"/>
+      <circle cx="21" cy="18" r="2.6" fill="currentColor"/>
+    </svg>
+    <span class="brand-mark">JANBOT</span>
+  </a>
+  <div class="hero-nav-links">
+    <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="docsNav">Contents</button>
+    <a class="plain active" href="docs.html" aria-current="page">Docs</a>
+    <a class="pill pill-hot" href="janbot-latest.dmg" download>Download</a>
+  </div>
+</nav>
+
+<div class="docs-shell">
+
+  <!-- ═══ LEFT RAIL ═══ -->
+  <aside class="docs-nav" id="docsNav" aria-label="Docs sections">
+    <span class="toc-label">Start here</span>
+    <a href="#getting-started">Getting started</a>
+    <a href="#first-run">First run &amp; onboarding</a>
+    <span class="toc-label">Using Janbot</span>
+    <a href="#chat">Chat &amp; the agent</a>
+    <a href="#models">Models &amp; providers</a>
+    <a href="#workspace">Workspace &amp; personality</a>
+    <a href="#tasks">Scheduled tasks &amp; goals</a>
+    <a href="#skills">Skills</a>
+    <span class="toc-label">Control &amp; trust</span>
+    <a href="#safety">Safety &amp; approvals</a>
+    <a href="#connectors">Connectors</a>
+    <a href="#mcp">MCP servers</a>
+    <a href="#memory">Memory &amp; wiki</a>
+    <a href="#privacy">Privacy &amp; data</a>
+    <span class="toc-label">Help</span>
+    <a href="#faq">FAQ &amp; troubleshooting</a>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="docs-main" id="docsMain">
+
+    <div class="docs-hero rev">
+      <p class="docs-kicker">Janbot help · macOS 14+ · Apple Silicon</p>
+      <h1>Get Janbot running, then hand it real work.</h1>
+      <p>Janbot is a native Mac agent that reads your documents, runs commands, searches the web, remembers what matters, and repeats on a schedule. You pick the model, and your data stays on your machine. These pages take you from download to your first finished task, then cover every control in the app.</p>
+      <p class="hero-fine">new here? start with <a href="#getting-started" style="color:var(--orange);text-decoration:none;">Getting started</a> → then <a href="#chat" style="color:var(--orange);text-decoration:none;">Chat &amp; the agent</a></p>
+    </div>
+
+    <!-- ══════ GETTING STARTED ══════ -->
+    <section class="doc rev" id="getting-started">
+      <span class="chip">✦ Getting started</span>
+      <h2>Install Janbot</h2>
+      <p class="lead">Janbot ships as a single Mac app. There's no account to create and nothing to meter. You download it, open it, and connect a model.</p>
+
+      <h3>Requirements</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>What</th><th>You need</th></tr></thead>
+          <tbody>
+            <tr><td><strong>macOS</strong></td><td>macOS 14 (Sonoma) or later</td></tr>
+            <tr><td><strong>Hardware</strong></td><td>Apple Silicon (M1 or newer)</td></tr>
+            <tr><td><strong>Disk / RAM</strong></td><td>The app is ~29&nbsp;MB. A local model needs more, so check the <a href="#models">RAM table</a>. Cloud models need almost nothing locally.</td></tr>
+            <tr><td><strong>A model</strong></td><td>Either a local server (LM&nbsp;Studio, Ollama) or a cloud API key (Claude, OpenRouter, Hugging&nbsp;Face). You pick during onboarding.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Download &amp; open</h3>
+      <ol>
+        <li>Download <code>janbot-latest.dmg</code> from the <a href="janbot-latest.dmg" download>Download button</a> at the top of any page.</li>
+        <li>Open the <code>.dmg</code> and drag <strong>Janbot</strong> into your <strong>Applications</strong> folder.</li>
+        <li>The first time you launch, right-click <span class="ui">Janbot.app</span> → <span class="ui">Open</span>, then confirm. After that it opens normally.</li>
+      </ol>
+
+      <div class="note warn">
+        <span class="note-label">Gatekeeper</span>
+        <p>The public build is an <strong>unsigned preview</strong>, so macOS may say it "cannot be verified." That's expected. Use <strong>right-click → Open</strong> once (not a double-click) to tell Gatekeeper you trust it. You only do this on first launch.</p>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Menu-bar app</span>
+        <p>Janbot lives in your menu bar. Closing the window <strong>hides</strong> it rather than quitting, so schedules and goals keep running. To have it start automatically, turn on <span class="ui">Start Janbot on login</span> in <span class="ui">Settings → Agent</span>.</p>
+      </div>
+    </section>
+
+    <!-- ══════ FIRST RUN ══════ -->
+    <section class="doc rev" id="first-run">
+      <span class="chip">▸ First run</span>
+      <h2>Onboarding, in four steps</h2>
+      <p class="lead">The first launch walks you through a short setup and then drops you into your first chat.</p>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-num">Step 1</span>
+          <h4>Welcome</h4>
+          <p>Meet your bot. Private, on your Mac, ready in minutes. Choose <span class="ui">Get started</span>.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">Step 2</span>
+          <h4>Model setup</h4>
+          <p>Janbot reads your chip and RAM and recommends a local model that fits, with download progress. Continue when it's ready.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">Step 3</span>
+          <h4>Workspace</h4>
+          <p>Pick a working directory. This is the sandbox folder for files Janbot creates and edits for you.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">Step 4</span>
+          <h4>Done</h4>
+          <p>Finish and land in the main app, ready for your first message.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Cloud-only? Skip the download</span>
+        <p>If you only plan to use Claude, OpenRouter, or Hugging Face, you don't need a local model. You can move past the local download and add your API key later in <span class="ui">Settings → Models</span>.</p>
+      </div>
+
+      <h3>Send your first message</h3>
+      <ol>
+        <li>Type a request in the composer at the bottom. For example: <em>"Summarize the PDF I'm about to drop in and list three action items."</em></li>
+        <li>Attach a file with the paperclip, or drag and drop it onto the composer.</li>
+        <li>Press <span class="ui">Enter</span> to send (<span class="ui">Shift+Enter</span> makes a new line).</li>
+        <li>Watch the turn unfold. Thinking, tool calls, and any approval requests all appear inside the reply. See <a href="#chat">Chat &amp; the agent</a>.</li>
+      </ol>
+      <p>After onboarding, Janbot resumes your latest task chat on restart, so you pick up where you left off.</p>
+    </section>
+
+    <!-- ══════ CHAT ══════ -->
+    <section class="doc rev" id="chat">
+      <span class="chip">▣ Chat &amp; the agent</span>
+      <h2>Rounds, not replies</h2>
+      <p class="lead">Janbot doesn't just answer. It works. A single message can turn into many rounds of thinking, using a tool, and reading the result, and you see all of it as it happens.</p>
+
+      <h3>The composer</h3>
+      <ul>
+        <li><strong>Attachments.</strong> Add files with the button, drag-and-drop, or paste. PDF, Excel, Word, PowerPoint, and images are all read natively.</li>
+        <li><strong>Slash commands.</strong> Type <code>/</code> to autocomplete a skill (see <a href="#skills">Skills</a>). This works mid-message, and on Telegram or Slack too.</li>
+        <li><strong>Model.</strong> Send with your default model, or pick another enabled slot from the pool.</li>
+        <li><strong>Reason</strong> sets how hard the model thinks for this message: <span class="ui">Auto</span> / Low / Medium / High / XHigh. Auto scales with the request, while High and above enable deeper thinking. Effort can also escalate on its own if the work looks incomplete.</li>
+        <li><strong>Capabilities</strong> is labelled <span class="ui">Allowed for this chat</span>. It decides which tool groups and MCP servers this conversation may use. More on it below.</li>
+        <li><strong>Stop</strong> halts a run at any time while it's working.</li>
+      </ul>
+
+      <h3>Reading a turn</h3>
+      <p>An assistant turn evolves <strong>inside its bubble</strong>: thinking, tool calls, approval prompts, and questions all appear there in order (the "turn timeline"). When the run finishes, it collapses to a summary like <em>"Thought for 6s · 9 actions,"</em> which you can expand again. Long threads open at the latest turn; scroll up or choose <span class="ui">Earlier messages</span> for history.</p>
+      <p>Replies can include inline images, link previews, and document preview cards. Each response offers <span class="ui">Copy</span>, <span class="ui">Share</span>, and <span class="ui">Retry</span>; your own prompts are selectable and copyable too.</p>
+
+      <h3>Approvals &amp; questions</h3>
+      <p>When Janbot wants to change your world, whether that's writing a file, editing something, or running a shell command, it <strong>pauses and asks</strong> inline, batching related calls into one request. Your choices:</p>
+      <ul>
+        <li><strong>Allow</strong> permits this action (or batch) once.</li>
+        <li><strong>Deny</strong> refuses it, and Janbot reads that and takes another path.</li>
+        <li><strong>Allow &amp; trust session</strong> auto-approves gated tools until this conversation ends or the app restarts.</li>
+      </ul>
+      <p>Expand any request to see the raw tool arguments. Janbot can also ask you a multiple-choice question mid-run when it needs a decision. Tune what requires approval in <a href="#safety">Safety</a>.</p>
+
+      <h3>Capabilities: per-chat policy</h3>
+      <p>The <span class="ui">Capabilities</span> picker sets what a single chat is allowed to touch. Built-in tool groups start on; MCP servers inherit your <a href="#mcp">Settings defaults</a>. Switching or reopening a chat resets the picker (the first send on a new draft can preserve your choices). An MCP server that needs sign-in stays disabled until you <span class="ui">Connect</span> it in <span class="ui">Settings → MCP</span>. Turning a namespace off is a policy choice for that conversation only, so it doesn't change anything globally.</p>
+
+      <h3>The sidebar</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>What's in it</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tasks</strong></td><td>Your recent chat threads; <span class="ui">New task</span> to start one.</td></tr>
+            <tr><td><strong>Scheduled</strong></td><td>Cron-style agent jobs with their own threads. See <a href="#tasks">Tasks</a>.</td></tr>
+            <tr><td><strong>Goals</strong></td><td>Standing long-term goals the agent checks over time.</td></tr>
+            <tr><td><strong>Archived</strong></td><td>Older or manually archived chats, schedules, and goals. Restore them where offered.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Each regular task has rename / archive / delete actions in its header bar. Opening <span class="ui">Settings</span> swaps the sidebar for settings navigation with a <span class="ui">Back to app</span> link.</p>
+
+      <div class="seealso"><b>See also</b> <a href="#safety">Safety &amp; approvals</a> · <a href="#models">Models</a> · <a href="#skills">Skills</a></div>
+    </section>
+
+    <!-- ══════ MODELS ══════ -->
+    <section class="doc rev" id="models">
+      <span class="chip">◈ Models &amp; providers</span>
+      <h2>Bring whichever mind you like</h2>
+      <p class="lead">Janbot runs on local models, cloud models, or a mix. You set one default and can override the model per message. If your default is unreachable, Janbot falls back to other enabled models automatically.</p>
+
+      <h3>Local vs cloud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Provider</th><th>How you connect</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>LM Studio</strong></td><td>Local server on port <code>1234</code></td><td>Auto-detected</td></tr>
+            <tr><td><strong>Ollama</strong></td><td>Local on port <code>11434</code></td><td>List, pull, and delete models in-app</td></tr>
+            <tr><td><strong>vLLM</strong></td><td>Local on port <code>8000</code></td><td>Auto-detect / Use</td></tr>
+            <tr><td><strong>llama.cpp</strong></td><td>Local on port <code>8080</code></td><td>Auto-detect / Use</td></tr>
+            <tr><td><strong>Claude</strong></td><td>API key in <span class="ui">Settings → Models</span></td><td>Models listed from the Anthropic API, with search</td></tr>
+            <tr><td><strong>Hugging Face</strong></td><td>HF token</td><td>Inference API</td></tr>
+            <tr><td><strong>OpenRouter</strong></td><td>API key</td><td>Requests set data collection to deny</td></tr>
+            <tr><td><strong>Custom API</strong></td><td>Base URL + optional key</td><td>Any OpenAI-compatible endpoint; lists <code>/v1/models</code>, or hand-enter IDs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The model pool &amp; default</h3>
+      <p>In <span class="ui">Settings → Models</span>, enable the providers you want and fill up to three model slots. Choose one as your <strong>default</strong> and <span class="ui">Save default</span>. Every chat starts on the default; the composer can override <span class="ui">Model</span> and <span class="ui">Reason</span> per message. Transient network or rate-limit errors retry automatically, and there's an in-app test you can run without touching your files.</p>
+
+      <h3>Recommended local models by RAM</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>RAM</th><th>Model</th><th>LM Studio search</th><th><code>ollama pull</code></th></tr></thead>
+          <tbody>
+            <tr><td><strong>8 GB</strong></td><td>Qwen3 4B (4-bit)</td><td><code>qwen3-4b</code></td><td><code>qwen3:4b</code></td></tr>
+            <tr><td><strong>16 GB</strong></td><td>Qwen3 8B (4-bit)</td><td><code>qwen3-8b</code></td><td><code>qwen3:8b</code></td></tr>
+            <tr><td><strong>32 GB</strong></td><td>Qwen3 30B-A3B (4-bit)</td><td><code>qwen3-30b-a3b</code></td><td><code>qwen3:30b-a3b</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note ok">
+        <span class="note-label">Hands beat size</span>
+        <p>A small model that can read your files and run your commands gets more done than a giant that can only talk. An 8&nbsp;GB Mac is enough to start.</p>
+      </div>
+
+      <div class="seealso"><b>See also</b> <a href="#privacy">Privacy &amp; data</a> · <a href="#faq">Troubleshooting connections</a></div>
+    </section>
+
+    <!-- ══════ WORKSPACE ══════ -->
+    <section class="doc rev" id="workspace">
+      <span class="chip">⌘ Workspace</span>
+      <h2>Where your files live, and where Janbot lives</h2>
+      <p class="lead">Janbot keeps two things apart: the <strong>working directory</strong> where it makes files for you, and <strong>Application Support</strong> where the app keeps its own brain.</p>
+
+      <h3>Working directory</h3>
+      <p>This is the sandbox folder for deliverables: reports, spreadsheets, and documents Janbot creates or edits on your behalf. You choose it during onboarding (often <code>~/Janbot-test</code> by default) and can change it in <span class="ui">Settings → Agent</span>. It's a blank workspace, <strong>not</strong> where personality or memory live.</p>
+
+      <h3>Personality: SOUL &amp; USER</h3>
+      <p>Janbot's behavior and what it knows about you are held in editable personality files (SOUL and USER), reachable from <span class="ui">Settings → Agent</span>. Edits to personality are gated behind approval, like any other change to your world. These live under Application Support, not in your working directory.</p>
+
+      <div class="note">
+        <span class="note-label">Two places, on purpose</span>
+        <p>Deleting a file in your working directory never touches Janbot's memory or settings. Wiping memory never deletes your deliverables. See <a href="#privacy">Privacy &amp; data</a> for the exact paths and the reset options.</p>
+      </div>
+    </section>
+
+    <!-- ══════ TASKS ══════ -->
+    <section class="doc rev" id="tasks">
+      <span class="chip">◷ Scheduled &amp; goals</span>
+      <h2>Work that runs without you</h2>
+      <p class="lead">Some jobs shouldn't wait for you to remember them. Scheduled tasks run on a clock; goals are standing intentions the agent revisits over time.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kind</th><th>What it is</th><th>Cadence</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Scheduled</strong></td><td>A saved prompt that runs on a schedule in its own chat thread. Each run stores the prompt, then the result.</td><td><code>every Xm</code>, <code>every Xh</code>, <code>daily HH:MM</code>, <code>weekly DAY HH:MM</code></td></tr>
+            <tr><td><strong>Goal</strong></td><td>A sticky long-term goal; the agent tells you when it'll check in again.</td><td>No fixed clock; a background worker decides.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The config bar</h3>
+      <p>Open a scheduled task or goal to find its controls on the thread: name and prompt/goal text, enable/pause, <span class="ui">Run now</span>, <span class="ui">Reasoning effort</span>, a <span class="ui">Notify channel</span> to mirror results to Telegram or Slack, and archive. Runs use your default model with the reasoning you set, and show a live <span class="ui">Running…</span> state when a background run is active. Add new ones with the <span class="ui">+</span> next to <span class="ui">Scheduled</span> or <span class="ui">Goals</span> in the sidebar.</p>
+
+      <div class="note warn">
+        <span class="note-label">Keep Janbot running</span>
+        <p>Scheduled work only fires while the app is running. Since closing the window just hides it, that's usually fine. But if you quit fully, turn on <span class="ui">Start Janbot on login</span> so schedules survive a restart.</p>
+      </div>
+    </section>
+
+    <!-- ══════ SKILLS ══════ -->
+    <section class="doc rev" id="skills">
+      <span class="chip">/ Skills</span>
+      <h2>Slash commands that expand into real work</h2>
+      <p class="lead">A skill is a reusable prompt pack. Type <code>/</code> in the composer to autocomplete one; it expands into a richer instruction for the agent.</p>
+
+      <h3>Bundled skills</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>/research</code></td><td>Deep web research written to a report file</td></tr>
+            <tr><td><code>/summarize</code></td><td>Summarize a URL</td></tr>
+            <tr><td><code>/write</code></td><td>Writing help</td></tr>
+            <tr><td><code>/remember</code></td><td>Store lasting notes</td></tr>
+            <tr><td><code>/wiki</code></td><td>Navigate your knowledge wiki</td></tr>
+            <tr><td><code>/pdf</code> <code>/docx</code> <code>/xlsx</code> <code>/pptx</code></td><td>Create, read, or edit a specific document format</td></tr>
+            <tr><td><code>/office</code></td><td>Umbrella guidance for Office files</td></tr>
+            <tr><td><code>/create-skill</code></td><td>Author a new skill of your own</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Managing skills</h3>
+      <p>The <span class="ui">Skills curator</span> lives in <span class="ui">Settings → Agent</span>. It pins the bundled skills and can archive agent-created skills that have gone unused for 90 days; run it manually with <span class="ui">Run curator</span>. Skills you or the agent write are hot-reloadable, so new ones show up in autocomplete right away.</p>
+    </section>
+
+    <!-- ══════ SAFETY ══════ -->
+    <section class="doc rev" id="safety">
+      <span class="chip">◆ Safety &amp; approvals</span>
+      <h2>It asks before it acts</h2>
+      <p class="lead">Janbot has real hands, so it's built to check with you before using them. Approvals and the sandbox are on by default; you decide how much to loosen.</p>
+
+      <h3>Why the pauses</h3>
+      <p>Anything that changes your machine, like writing or editing files, running shell commands, or editing personality, pauses the run for your <a href="#chat">inline approval</a>. You can allow once, deny, or <span class="ui">Allow &amp; trust session</span> to stop being asked until the conversation ends.</p>
+
+      <h3>Approval rules</h3>
+      <p>Tune what needs approval in <span class="ui">Settings → Safety</span>:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rule</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td>Auto-approve file writes in working directory</td><td>Skip the prompt for writes inside your sandbox folder</td></tr>
+            <tr><td>Auto-approve all file writes <em>(danger)</em></td><td>Skip prompts for writes <strong>anywhere</strong> Janbot can reach</td></tr>
+            <tr><td>Auto-approve create directory</td><td>Let Janbot make folders without asking</td></tr>
+            <tr><td>Auto-approve all shell commands <em>(danger)</em></td><td>Run any shell command without asking</td></tr>
+            <tr><td>Auto-approve workflow and personality edits</td><td>Let it manage schedules/goals and edit personality unprompted</td></tr>
+            <tr><td>Workflow tool calls require approval</td><td>Keep a prompt in front of workflow/schedule changes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note danger">
+        <span class="note-label">The danger toggles</span>
+        <p>"Auto-approve all file writes" and "auto-approve all shell commands" remove the guardrails that keep the agent inside your sandbox. Only enable them when you fully trust the task and know what the agent can reach.</p>
+      </div>
+
+      <h3>The Seatbelt sandbox</h3>
+      <p>Shell commands run inside macOS <strong>Seatbelt</strong>, on by default:</p>
+      <ul>
+        <li><strong>On.</strong> Shell skips the approval pause, but dangerous patterns are still blocked at execution, and the <strong>network is denied by default</strong> (allowlisted <code>curl</code>/<code>wget</code> can reach out).</li>
+        <li><strong>Off.</strong> Janbot falls back to a shell allowlist plus the approval path. The built-in allowlist covers common read-only commands and a few read-only git commands.</li>
+      </ul>
+
+      <h3>Hooks (advanced)</h3>
+      <p>Power users can intercept the agent's actions with hooks. There's no Settings UI for them, so you define them in <span class="path">~/Library/Application Support/Janbot/agent/hooks.json</span> for events like pre/post tool use, prompt submit, pre-compact, and stop, with actions such as allow, deny, audit log, or redact. See the hooks reference for the full schema.</p>
+
+      <div class="seealso"><b>See also</b> <a href="#chat">Approvals in chat</a> · <a href="#mcp">MCP auto-approve</a> · <a href="#privacy">Privacy &amp; data</a></div>
+    </section>
+
+    <!-- ══════ CONNECTORS ══════ -->
+    <section class="doc rev" id="connectors">
+      <span class="chip">⇄ Connectors</span>
+      <h2>Reach Janbot from anywhere</h2>
+      <p class="lead">Connectors let Janbot talk to the services you already use. Set them up in <span class="ui">Settings → Connectors</span>, where each card has a Connect or Manage dialog.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Connector</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Telegram</strong></td><td>Chat with Janbot from your phone using a bot token from @BotFather</td></tr>
+            <tr><td><strong>Slack</strong></td><td>Index channels, optionally reply to DMs/@mentions, and post from your desktop chat</td></tr>
+            <tr><td><strong>Google Workspace</strong></td><td>Pick services, then authorize in the browser</td></tr>
+            <tr><td><strong>Local files</strong></td><td>Mount folders read-only or read-write</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Telegram</h3>
+      <ul>
+        <li>Two-way, with history saved. Photos you send go to the model; Janbot sends images back with <code>![alt](path)</code> when the file is under your working directory.</li>
+        <li>Scheduled/goal results can be delivered to Telegram.</li>
+        <li>Rate limit is about 5 messages per 60 seconds per user; it auto-reconnects when a token is saved.</li>
+      </ul>
+
+      <h3>Slack</h3>
+      <ul>
+        <li>Two modes: <strong>interactive</strong> (reply to DMs and @mentions) or <strong>search-only</strong>. You can restrict it to an allowlisted Slack user.</li>
+        <li>An indexer makes channel history searchable; sending a message from the desktop is approval-gated, and the bot must be in the channel.</li>
+        <li>Rate limit is about 5 messages per 60 seconds per channel.</li>
+      </ul>
+
+      <h3>Google Workspace</h3>
+      <ul>
+        <li>Services: Gmail, Calendar, Drive (read), and Docs &amp; Slides (read/write).</li>
+        <li>You authorize in the browser and grant only the scopes you select; writes stay approval-gated.</li>
+      </ul>
+
+      <h3>Local folders</h3>
+      <p>Mount folders outside your working directory read-only or read-write. Tools respect each mount's permission boundary.</p>
+
+      <div class="note">
+        <span class="note-label">Fewer tools on connectors</span>
+        <p>When you talk to Janbot through Telegram or Slack, it has a reduced tool set compared to the desktop app.</p>
+      </div>
+    </section>
+
+    <!-- ══════ MCP ══════ -->
+    <section class="doc rev" id="mcp">
+      <span class="chip">⧉ MCP</span>
+      <h2>Plug in more tools</h2>
+      <p class="lead">MCP (Model Context Protocol) servers add tools from other apps and services: Linear, Spark, your own scripts, and more. Manage them in <span class="ui">Settings → MCP</span>.</p>
+
+      <h3>Add a server</h3>
+      <ol>
+        <li>Add a <strong>stdio</strong> server (a local command) or a <strong>Streamable HTTP</strong> remote server.</li>
+        <li>Set any environment variables or auth headers it needs.</li>
+        <li>For OAuth servers, choose <span class="ui">Connect</span>. A browser window handles sign-in, and tokens are stored in Application Support or your Keychain.</li>
+        <li>Check the server's health and the tools it discovered.</li>
+        <li>Enable it for a chat from the composer's <span class="ui">Capabilities</span> picker.</li>
+      </ol>
+
+      <div class="note warn">
+        <span class="note-label">Approvals still apply</span>
+        <p>MCP tool calls are approval-gated like everything else, unless you opt a server into auto-approve per server. Turn that on only for servers you trust, since it lets those tools act without asking.</p>
+      </div>
+
+      <p>A server that needs OAuth stays disabled in the Capabilities picker until you complete <span class="ui">Connect</span> in <span class="ui">Settings → MCP</span>. Credentials, tests, approval policy, and editing all stay in Settings, not the chat.</p>
+    </section>
+
+    <!-- ══════ MEMORY ══════ -->
+    <section class="doc rev" id="memory">
+      <span class="chip">❖ Memory &amp; wiki</span>
+      <h2>It remembers on purpose</h2>
+      <p class="lead">With wiki-backed memory on, Janbot turns what it learns into a structured, searchable knowledge base, and the most relevant notes get pulled into new chats automatically.</p>
+
+      <h3>How it feels</h3>
+      <ul>
+        <li>Observations are merged into a markdown <strong>wiki</strong> of linked pages, then indexed for hybrid keyword + vector search.</li>
+        <li>Embeddings run <strong>on-device</strong>, so nothing is sent away in order to be remembered.</li>
+        <li>Relevant memories and their sources can appear as citations on responses.</li>
+      </ul>
+
+      <h3>Managing memory</h3>
+      <p>Turn <span class="ui">Wiki-backed memory</span> on or off in <span class="ui">Settings → Agent → Interface</span>. The <span class="ui">Memory</span> tab (under Advanced; make it visible from <span class="ui">Agent</span>) lets you browse, edit, and delete stored memories and watch the ingest queue. Deleting a wiki entry removes its markdown, so a re-index won't bring it back.</p>
+
+      <div class="note">
+        <span class="note-label">Strict completeness check</span>
+        <p>Also under <span class="ui">Agent → Interface</span>: <span class="ui">Strict completeness check</span> runs a gap review before Janbot responds (and a citation check when the web was used). It's skipped automatically on High and above reasoning.</p>
+      </div>
+    </section>
+
+    <!-- ══════ PRIVACY ══════ -->
+    <section class="doc rev" id="privacy">
+      <span class="chip">⌀ Privacy &amp; data</span>
+      <h2>What stays on your Mac</h2>
+      <p class="lead">Your conversations, settings, memories, wiki, skills, and personality all live on your machine. Data only leaves when you point Janbot at a cloud model or a connector that calls an external service.</p>
+
+      <h3>Where things live</h3>
+      <p>Everything Janbot knows lives in one file you can open:</p>
+      <span class="path-block">~/Library/Application Support/Janbot/janbot.db</span>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Location</th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td><span class="path">…/Janbot/janbot.db</span></td><td>Chats, tasks, settings, memories, stats</td></tr>
+            <tr><td><span class="path">…/Janbot/agent/</span></td><td>Personality (SOUL, USER), skills, wiki, hooks, context</td></tr>
+            <tr><td><span class="path">…/Janbot/runtime/</span></td><td>Runtime caches and catalogs</td></tr>
+            <tr><td>Your working directory</td><td>The files Janbot makes for you (a blank sandbox, <em>not</em> personality)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Secrets are stored in the macOS Keychain in signed release builds (in vault files under Application Support for unsigned/dev builds).</p>
+
+      <div class="note ok">
+        <span class="note-label">Nothing leaves for inference by default</span>
+        <p>With a local model from LM Studio or Ollama, a complete agent run makes <strong>zero</strong> network calls. Inference, memory, and embeddings all happen on your hardware. Data only leaves your Mac when you configure a cloud provider (Claude, Hugging Face, OpenRouter, Custom) or use web/connector tools that call external APIs.</p>
+      </div>
+
+      <h3>Resetting &amp; wiping</h3>
+      <p>In <span class="ui">Settings → Agent → Data management</span>:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Clear all tasks</strong></td><td>Removes chats, scheduled/goal tasks, and context folders</td></tr>
+            <tr><td><strong>Clear all memory</strong></td><td>Wipes memories, wiki, stats, workflow runs, and traces, but keeps settings and task definitions</td></tr>
+            <tr><td><strong>Reset settings</strong></td><td>Restores defaults but keeps your data</td></tr>
+            <tr><td><strong>Factory reset</strong></td><td>Clears everything</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="note-label">Cloud reminder</span>
+        <p>When you choose a cloud model, your prompts (and attached content) leave your Mac to reach that provider. OpenRouter requests are sent with data collection set to deny, but the prompt still travels. Use a local model for fully on-device runs.</p>
+      </div>
+    </section>
+
+    <!-- ══════ FAQ ══════ -->
+    <section class="doc rev" id="faq">
+      <span class="chip">? FAQ &amp; troubleshooting</span>
+      <h2>Common questions</h2>
+      <p class="lead">Quick fixes for the things people hit first. If something here doesn't match the app, trust the app, since labels move faster than docs.</p>
+
+      <h3>Gatekeeper blocks the DMG</h3>
+      <p>The preview build is unsigned. Right-click <span class="ui">Janbot.app</span> → <span class="ui">Open</span> (don't double-click) and confirm once. See <a href="#getting-started">Install</a>.</p>
+
+      <h3>No models, or "can't connect"</h3>
+      <p>Is LM Studio or Ollama actually running? Check the ports (<code>1234</code> for LM Studio, <code>11434</code> for Ollama). For cloud, confirm the API key is saved in <span class="ui">Settings → Models</span>. Try <span class="ui">Auto-detect</span> and the in-app test.</p>
+
+      <h3>Janbot keeps asking for approval</h3>
+      <p>That's the safety model working. Use <span class="ui">Allow &amp; trust session</span> for a run, or loosen specific rules in <a href="#safety">Settings → Safety</a>. Keep Seatbelt on so shell doesn't need a pause for every command.</p>
+
+      <h3>Shell can't reach the network</h3>
+      <p>Seatbelt denies network by default. Prefer the web tools for anything online, or carefully adjust the sandbox/allowlist. See <a href="#safety">Safety</a>.</p>
+
+      <h3>Capabilities is missing my MCP tools</h3>
+      <p>Complete <span class="ui">Connect</span> (OAuth) in <span class="ui">Settings → MCP</span>, then enable the server in the chat's <span class="ui">Capabilities</span> picker. Calls may still ask for approval. See <a href="#mcp">MCP</a>.</p>
+
+      <h3>A scheduled task didn't run</h3>
+      <p>Check it's enabled, that the schedule format is valid (<code>daily 09:00</code>, <code>weekly MON 09:00</code>, etc.), and that the app is running. Turn on <span class="ui">Start Janbot on login</span> so it survives restarts. See <a href="#tasks">Tasks</a>.</p>
+
+      <h3>Where are my files?</h3>
+      <p>Deliverables are in your <a href="#workspace">working directory</a>. The app's own data (personality, skills, wiki, database) is under Application Support. See <a href="#privacy">Privacy &amp; data</a>.</p>
+
+      <h3>Telegram or Slack is silent</h3>
+      <p>Check the token, wait for reconnect, and mind the rate limits (~5 messages/60s). For Slack, confirm the mode (interactive vs search-only), any user allowlist, and that the bot is in the channel. See <a href="#connectors">Connectors</a>.</p>
+
+      <h3>Memory isn't recalling anything</h3>
+      <p>Make sure <span class="ui">Wiki-backed memory</span> is on, open the <span class="ui">Memory</span> tab, and check the ingest queue for pending or failed items. See <a href="#memory">Memory</a>.</p>
+
+      <h3>Factory reset vs. clear memory?</h3>
+      <p><strong>Clear all memory</strong> wipes what Janbot knows but keeps your settings and task definitions. <strong>Factory reset</strong> clears everything. Full table in <a href="#privacy">Privacy &amp; data</a>.</p>
+
+      <h3>What's RTK?</h3>
+      <p>An optional tool for token-optimized shell output. If it's installed, Janbot uses it automatically, and there's nothing to configure.</p>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="foot">
+    <span>© 2026 Janbot</span>
+    <span>Built by bots, for people.</span>
+    <div class="foot-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="janbot-latest.dmg" download>Download</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── Reveal on scroll ── */
+    var revEls = document.querySelectorAll('.rev');
+    if (reduce || !('IntersectionObserver' in window)) {
+      revEls.forEach(function (el) { el.classList.add('in'); });
+    } else {
+      var reveal = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          en.target.classList.add('in');
+          reveal.unobserve(en.target);
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+      revEls.forEach(function (el) { reveal.observe(el); });
+    }
+
+    /* ── Scroll-spy: highlight the active TOC link ── */
+    var navLinks = [].slice.call(document.querySelectorAll('.docs-nav a'));
+    var byId = {};
+    navLinks.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    var sections = [].slice.call(document.querySelectorAll('section.doc'));
+
+    if ('IntersectionObserver' in window) {
+      var current = null;
+      var spy = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) current = en.target.id;
+        });
+        if (current && byId[current]) {
+          navLinks.forEach(function (a) { a.classList.remove('active'); });
+          byId[current].classList.add('active');
+        }
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      sections.forEach(function (s) { spy.observe(s); });
+    }
+
+    /* ── Mobile contents toggle ── */
+    var toggle = document.getElementById('tocToggle');
+    var nav = document.getElementById('docsNav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function () {
+        var open = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      nav.addEventListener('click', function (e) {
+        if (e.target.tagName === 'A') {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
