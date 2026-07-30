@@ -138,7 +138,9 @@
   .hero-panel {
     position: relative;
     background:
-      radial-gradient(125% 92% at 50% -12%, #FF9042 0%, var(--orange) 44%, #EF6000 100%);
+      radial-gradient(129.47% 179.42% at 50% 0%, #FF6A00 0%, #FF974D 24.96%, #F47F2C 54.42%, #FF6A00 100%);
+    background-size: 160% 200%;
+    background-position: 50% 0%;
     color: var(--ink);
     border-radius: clamp(18px, 2.4vw, 30px);
     overflow: hidden;
@@ -146,6 +148,15 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+  .hero-panel:hover { animation: gradient-drift 7s ease-in-out infinite; }
+  @keyframes gradient-drift {
+    0%   { background-position: 50% 0%; }
+    50%  { background-position: 50% 100%; }
+    100% { background-position: 50% 0%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-panel:hover, .cta-panel:hover { animation: none; }
   }
   /* faint blueprint grid, lit from the top and fading toward the edges */
   .hero-panel::before {
@@ -410,10 +421,14 @@
     white-space: nowrap;
   }
   .ticker-track {
-    display: inline-flex;
+    display: flex;
+    width: max-content;
     padding: 12px 0;
     animation: tick 46s linear infinite;
+    will-change: transform;
   }
+  /* 4 identical sets; -50% shifts exactly 2 sets, which always
+     overflow the viewport, so the loop never shows a gap. */
   @keyframes tick {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
@@ -640,7 +655,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1400px;
+    perspective: 1050px;
   }
   /* ambient glow that breathes behind the terminal */
   .runlog-sticky::before {
@@ -814,7 +829,55 @@
 
   .lrow .st { flex: 0 0 12px; position: relative; }
   .lrow .st-ok { color: var(--ok); }
-  .lrow .tool { color: var(--bone); }
+  /* tool names read as small pills that ignite when their step fires */
+  .lrow .tool {
+    color: var(--bone);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    padding: 1px 7px;
+    background: rgba(240, 235, 225, 0.02);
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease),
+                background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .lrow.active:not(.lrow-user) .tool {
+    color: var(--orange);
+    border-color: rgba(255, 106, 0, 0.55);
+    background: rgba(255, 106, 0, 0.1);
+    box-shadow: 0 0 12px -2px rgba(255, 106, 0, 0.5);
+  }
+
+  /* ── header compute meter: a live equalizer while rounds run ── */
+  .rl-spark {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 11px;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+  .runlog.live .rl-spark { opacity: 0.9; }
+  .rl-spark > i {
+    width: 2px;
+    height: 100%;
+    background: var(--orange);
+    transform-origin: bottom;
+    transform: scaleY(0.18);
+    border-radius: 1px;
+  }
+  .runlog.live .rl-spark > i { animation: rl-eq 0.9s var(--ease) infinite; }
+  .rl-spark > i:nth-child(1) { animation-delay: 0s;    animation-duration: 0.85s; }
+  .rl-spark > i:nth-child(2) { animation-delay: 0.14s; animation-duration: 1.05s; }
+  .rl-spark > i:nth-child(3) { animation-delay: 0.32s; animation-duration: 0.78s; }
+  .rl-spark > i:nth-child(4) { animation-delay: 0.08s; animation-duration: 1.15s; }
+  .rl-spark > i:nth-child(5) { animation-delay: 0.24s; animation-duration: 0.9s;  }
+  .rl-spark > i:nth-child(6) { animation-delay: 0.4s;  animation-duration: 1.0s;  }
+  .rl-spark > i:nth-child(7) { animation-delay: 0.16s; animation-duration: 0.82s; }
+  .rl-spark > i:nth-child(8) { animation-delay: 0.3s;  animation-duration: 1.1s;  }
+  .rl-spark > i:nth-child(9) { animation-delay: 0.06s; animation-duration: 0.95s; }
+  @keyframes rl-eq {
+    0%, 100% { transform: scaleY(0.18); }
+    50%      { transform: scaleY(1); }
+  }
   .lrow.lrow-user { color: var(--bone-2); font-style: italic; padding-bottom: 12px; }
   .lrow-gate {
     background: rgba(255, 106, 0, 0.06);
@@ -835,8 +898,36 @@
     padding: 2px 8px;
     margin-right: 6px;
   }
+  /* held-breath beat: the gate throbs while the write is pending approval */
+  .lrow-gate.active .gate-chip {
+    animation: gate-held 1.1s var(--ease) infinite;
+  }
+  @keyframes gate-held {
+    0%, 100% { background: rgba(255, 106, 0, 0);    box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.4); }
+    50%      { background: rgba(255, 106, 0, 0.16); box-shadow: 0 0 0 4px rgba(255, 106, 0, 0); }
+  }
   .gate-ok { color: var(--ok); }
+  /* once the write is allowed, the verdict lands with a brief flash */
+  .lrow-gate.show:not(.active) .gate-ok {
+    animation: gate-land 0.7s var(--ease);
+    text-shadow: 0 0 10px rgba(64, 200, 120, 0.5);
+  }
+  @keyframes gate-land {
+    0%   { text-shadow: 0 0 16px rgba(64, 200, 120, 0.9); }
+    100% { text-shadow: 0 0 10px rgba(64, 200, 120, 0.5); }
+  }
+
   .lrow-done { color: var(--bone-2); padding-top: 12px; }
+  /* final line breathes once when the run completes */
+  .runlog.done .lrow-done {
+    animation: rl-finish 1.1s var(--ease);
+  }
+  .runlog.done .lrow-done .st-ok { color: var(--ok); }
+  @keyframes rl-finish {
+    0%   { color: var(--bone); text-shadow: 0 0 18px rgba(64, 200, 120, 0.55); }
+    60%  { text-shadow: 0 0 12px rgba(64, 200, 120, 0.3); }
+    100% { color: var(--bone-2); text-shadow: none; }
+  }
 
   /* ═══════════ CAPABILITIES — bordered six ═══════════ */
   .six {
@@ -988,11 +1079,14 @@
   }
   .cta-panel {
     position: relative;
-    background: var(--orange);
+    background: radial-gradient(129.47% 179.42% at 50% 0%, #FF6A00 0%, #FF974D 24.96%, #F47F2C 54.42%, #FF6A00 100%);
+    background-size: 160% 200%;
+    background-position: 50% 0%;
     color: var(--ink);
     border-radius: clamp(18px, 2.4vw, 30px);
     overflow: hidden;
   }
+  .cta-panel:hover { animation: gradient-drift 7s ease-in-out infinite; }
   .cta-panel ::selection { background: rgba(19, 17, 16, 0.85); color: var(--orange); }
   #cta .wrap {
     padding-top: clamp(80px, 11vh, 140px);
@@ -1295,6 +1389,22 @@
       <span>Asks before it writes</span><i>◆</i>
       <span>Scheduled runs while you sleep</span><i>◆</i>
     </div>
+    <div class="ticker-set" aria-hidden="true">
+      <span>Native on Apple Silicon</span><i>◆</i>
+      <span>Runs 100% offline</span><i>◆</i>
+      <span>Any model, local or cloud</span><i>◆</i>
+      <span>21 built-in tools + MCP</span><i>◆</i>
+      <span>Asks before it writes</span><i>◆</i>
+      <span>Scheduled runs while you sleep</span><i>◆</i>
+    </div>
+    <div class="ticker-set" aria-hidden="true">
+      <span>Native on Apple Silicon</span><i>◆</i>
+      <span>Runs 100% offline</span><i>◆</i>
+      <span>Any model, local or cloud</span><i>◆</i>
+      <span>21 built-in tools + MCP</span><i>◆</i>
+      <span>Asks before it writes</span><i>◆</i>
+      <span>Scheduled runs while you sleep</span><i>◆</i>
+    </div>
   </div>
 </div>
 
@@ -1461,6 +1571,7 @@
           <div class="runlog" id="runlog" role="img" aria-label="A run log: you ask for a weekly invoice summary; Janbot reads the spreadsheet, checks an exchange rate, notices a discrepancy and rereads, pauses at an approval gate before writing the report, schedules the Monday run, and finishes.">
             <div class="runlog-head">
               <span>RUN 0142 · <b>qwen3-30b-a3b</b> · LOCAL</span>
+              <span class="rl-spark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
               <span class="rl-meta">round <b id="rlRound">0</b>/9 · <span id="rlTime">0.0s</span></span>
               <span class="rl-status"><i class="rl-dot"></i><span id="rlStatusText">RUNNING</span></span>
             </div>
@@ -1824,9 +1935,11 @@
         // Intro zoom: plays once as the terminal enters, then holds static.
         var enter = Math.min(1, p / this.ENTER);
         var ez = 1 - Math.pow(1 - enter, 3);           // easeOutCubic
-        var scale = 0.9 + 0.1 * ez;
-        var tilt = (1 - ez) * 6;                        // deg, flattens to 0
-        log.style.transform = 'scale(' + scale.toFixed(4) + ') rotateX(' + tilt.toFixed(2) + 'deg)';
+        var scale = 0.78 + 0.27 * ez;                   // 0.78 → 1.05, punches in
+        var tilt = (1 - ez) * 18;                       // deg, flattens from a steep 18
+        var lift = (1 - ez) * 44;                       // px, rises into place
+        log.style.transform = 'translateY(' + lift.toFixed(1) + 'px) scale(' +
+          scale.toFixed(4) + ') rotateX(' + tilt.toFixed(2) + 'deg)';
         log.style.opacity = (0.5 + 0.5 * Math.min(1, p / (this.ENTER * 0.6))).toFixed(3);
 
         // Typing scrub: characters map 1:1 to scroll across the type band.

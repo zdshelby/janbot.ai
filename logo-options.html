@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Janbot · concepts v3</title>
+<style>
+  :root{
+    --bg:#0b0b0d; --panel:#111114; --line:#1e1e24;
+    --white:#f4f4f5; --muted:#7d7d86;
+    --orange:#ff6600; --orange-deep:#e85d00;
+    --mono:'SF Mono','Fira Code',ui-monospace,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--white);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;padding:64px 24px 96px}
+  header{max-width:1120px;margin:0 auto 48px}
+  h1{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0 0 8px}
+  header p{color:var(--muted);font-size:14px;margin:0;line-height:1.6;font-family:var(--mono)}
+  .grid{max-width:1120px;margin:0 auto;display:grid;gap:20px;
+    grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;display:flex;flex-direction:column}
+  .stage{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 120% at 50% 0%,#141418 0%,#0c0c0e 70%);padding:28px}
+  .meta{padding:16px 18px;border-top:1px solid var(--line)}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:.08em;text-transform:uppercase}
+  .name{font-size:15px;font-weight:600;margin:6px 0 4px}
+  .desc{font-size:13px;color:var(--muted);line-height:1.55}
+  .why{font-size:12px;color:#9a9aa2;margin-top:8px;line-height:1.5}
+  .why b{color:#cfcfd4;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>Janbot — five concepts, five metaphors</h1>
+  <p>not styling variants · pick the IDEA that fits · dark / native / orange rationed</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1 · NAME BADGE -->
+  <div class="card">
+    <div class="stage">
+      <svg width="230" height="150" viewBox="0 0 230 150" role="img" aria-label="hello my name is Jan badge">
+        <rect x="10" y="10" width="210" height="130" rx="12" fill="#16161a" stroke="#2a2a31" stroke-width="1.5"/>
+        <path d="M10 22 a12 12 0 0 1 12 -12 h186 a12 12 0 0 1 12 12 v22 h-222 z" fill="#ff6600"/>
+        <text x="115" y="34" text-anchor="middle" font-family="'SF Pro Text',sans-serif"
+              font-size="17" font-weight="800" letter-spacing="3" fill="#111">HELLO</text>
+        <text x="115" y="64" text-anchor="middle" font-family="'SF Mono',monospace"
+              font-size="10" letter-spacing="2" fill="#7d7d86">MY NAME IS</text>
+        <text x="115" y="116" text-anchor="middle" font-family="'Bradley Hand','Segoe Print',cursive"
+              font-size="52" font-weight="700" fill="#f4f4f5">Jan</text>
+      </svg>
+    </div>
+    <div class="meta">
+      <div class="tag">01 · the colleague</div>
+      <div class="name">“My name is Jan” badge</div>
+      <div class="desc">The classic name tag. Instantly human, warm, a little cheeky.</div>
+      <div class="why"><b>Says:</b> this isn’t software, it’s someone on your team. Nobody in AI does this.</div>
+    </div>
+  </div>
+
+  <!-- 2 · SIGNATURE -->
+  <div class="card">
+    <div class="stage">
+      <svg width="240" height="120" viewBox="0 0 240 120" role="img" aria-label="Jan signature">
+        <text x="30" y="78" font-family="'Snell Roundhand','Segoe Script',cursive"
+              font-size="72" font-weight="700" fill="#f4f4f5">Jan</text>
+        <path d="M28 92 h150" stroke="#ff6600" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="184" cy="92" r="3.5" fill="#ff6600"/>
+      </svg>
+    </div>
+    <div class="meta">
+      <div class="tag">02 · signs its work</div>
+      <div class="name">The signature</div>
+      <div class="desc">A handwritten autograph with an orange underline flourish.</div>
+      <div class="why"><b>Says:</b> an agent that takes ownership and <b>signs off</b> on what it did for you. Personal, confident, premium.</div>
+    </div>
+  </div>
+
+  <!-- 3 · JANITOR KEY -->
+  <div class="card">
+    <div class="stage">
+      <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="key mark">
+        <!-- bow shaped like a J hook -->
+        <path d="M60 20 v34" fill="none" stroke="#f4f4f5" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="60" cy="30" r="16" fill="none" stroke="#f4f4f5" stroke-width="8"/>
+        <circle cx="60" cy="30" r="5" fill="#ff6600"/>
+        <!-- stem -->
+        <path d="M60 54 v40" fill="none" stroke="#f4f4f5" stroke-width="8" stroke-linecap="round"/>
+        <!-- teeth -->
+        <path d="M60 78 h14 M60 90 h10" fill="none" stroke="#ff6600" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="meta">
+      <div class="tag">03 · the caretaker</div>
+      <div class="name">Janitor’s key</div>
+      <div class="desc">“Jan” is one letter from janitor — the agent with keys to your machine that tidies up and runs on schedule.</div>
+      <div class="why"><b>Says:</b> trusted local access + maintenance. An ownable metaphor, not a generic AI orb.</div>
+    </div>
+  </div>
+
+  <!-- 4 · CLASSIC MAC PIXEL -->
+  <div class="card">
+    <div class="stage">
+      <svg width="220" height="110" viewBox="0 0 220 110" role="img" aria-label="pixel jan" shape-rendering="crispEdges">
+        <g fill="#f4f4f5">
+          <!-- j -->
+          <rect x="24" y="34" width="12" height="12"/>
+          <rect x="24" y="58" width="12" height="36"/><rect x="12" y="82" width="12" height="12"/>
+          <!-- a -->
+          <rect x="60" y="58" width="36" height="12"/><rect x="84" y="70" width="12" height="24"/>
+          <rect x="60" y="82" width="24" height="12"/><rect x="60" y="70" width="12" height="12"/>
+          <!-- n -->
+          <rect x="120" y="58" width="12" height="36"/><rect x="132" y="58" width="24" height="12"/>
+          <rect x="156" y="58" width="12" height="36"/>
+        </g>
+        <rect x="24" y="34" width="12" height="12" fill="#ff6600"/>
+      </svg>
+    </div>
+    <div class="meta">
+      <div class="tag">04 · native mac</div>
+      <div class="name">Classic-Mac pixel mark</div>
+      <div class="desc">A 1-bit, Susan-Kare-era bitmap “jan”, single orange pixel as the dot.</div>
+      <div class="why"><b>Says:</b> proudly, unmistakably a Mac app. Nostalgic craft, not AI-slop gradient.</div>
+    </div>
+  </div>
+
+  <!-- 5 · EXTRA · APP ICON (key on tile) -->
+  <div class="card">
+    <div class="stage">
+      <svg width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="app icon">
+        <defs>
+          <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1c1c22"/><stop offset="1" stop-color="#0e0e11"/>
+          </linearGradient>
+          <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+            <stop offset="0" stop-color="#ff6600" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#ff6600" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#tile)" stroke="#2a2a31"/>
+        <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#glow)"/>
+        <g transform="translate(4,2)">
+          <circle cx="60" cy="44" r="18" fill="none" stroke="#f4f4f5" stroke-width="7"/>
+          <circle cx="60" cy="44" r="6" fill="#ff6600"/>
+          <path d="M60 62 v34" stroke="#f4f4f5" stroke-width="7" stroke-linecap="round"/>
+          <path d="M60 80 h16 M60 92 h11" stroke="#ff6600" stroke-width="7" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    <div class="meta">
+      <div class="tag">05 · extra · hero icon</div>
+      <div class="name">Key, as the app tile</div>
+      <div class="desc">Concept 03 built into a full macOS icon with depth + a faint warm glow.</div>
+      <div class="why"><b>Says:</b> the dock/menu-bar face of the caretaker idea. Distinct at any size.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
