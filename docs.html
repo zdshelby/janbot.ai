@@ -46,8 +46,7 @@
     --ease: cubic-bezier(0.33, 0, 0.15, 1);
     --focus-ring: 0 0 0 3px rgba(255, 106, 0, 0.5);
     --frame: clamp(10px, 1.6vw, 18px);
-    --banner-h: 42px;
-    --nav-h: 103px;
+    --nav-h: 61px;
   }
 
   html { scroll-behavior: smooth; }
@@ -96,34 +95,9 @@
   .pill-line { border: 1.5px solid var(--line); color: var(--bone); }
   .pill-line:hover { border-color: rgba(255,106,0,.6); background: rgba(255,106,0,.05); }
 
-  /* ── Access banner + sticky top nav ── */
-  .access-banner {
-    position: sticky; top: 0; z-index: 61;
-    display: flex; align-items: center; justify-content: center;
-    gap: 12px; flex-wrap: wrap;
-    min-height: var(--banner-h);
-    padding: 10px clamp(16px, 3vw, 28px);
-    background: var(--orange); color: var(--ink);
-    text-decoration: none;
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em;
-    line-height: 1.35; text-align: center;
-    transition: background 0.18s var(--ease);
-  }
-  .access-banner:hover { background: #FF7D1F; }
-  .access-banner-label {
-    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
-  }
-  .access-banner-msg { opacity: 0.88; }
-  .access-banner-cta {
-    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-    border-bottom: 1.5px solid currentColor; padding-bottom: 1px;
-  }
-  @media (max-width: 640px) {
-    .access-banner-msg { display: none; }
-  }
-
+  /* ── Top nav (sticky) ── */
   .top-nav {
-    position: sticky; top: var(--banner-h); z-index: 60;
+    position: sticky; top: 0; z-index: 60;
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px clamp(20px, 4vw, 44px);
     background: rgba(18, 18, 18, 0.82);
@@ -398,12 +372,6 @@
 <body>
 
 <a class="skip" href="#getting-started">Skip to content</a>
-
-<a class="access-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">
-  <span class="access-banner-label">Private preview</span>
-  <span class="access-banner-msg">Public download is paused — request access and we’ll be in touch.</span>
-  <span class="access-banner-cta">Request access →</span>
-</a>
 
 <!-- ═══ NAV ═══ -->
 <nav class="top-nav" aria-label="Site">

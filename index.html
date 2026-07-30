@@ -111,41 +111,6 @@
   /* ═══════════ HERO — an orange panel, framed on the dark page ═══════════ */
   :root { --frame: clamp(10px, 1.6vw, 18px); }
 
-  .access-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 10px clamp(16px, 3vw, 28px);
-    background: var(--orange);
-    color: var(--ink);
-    text-decoration: none;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    line-height: 1.35;
-    text-align: center;
-    transition: background 0.18s var(--ease);
-  }
-  .access-banner:hover { background: #FF7D1F; }
-  .access-banner-label {
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .access-banner-msg { opacity: 0.88; }
-  .access-banner-cta {
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    border-bottom: 1.5px solid currentColor;
-    padding-bottom: 1px;
-  }
-  @media (max-width: 640px) {
-    .access-banner-msg { display: none; }
-  }
-
   .top-nav {
     display: flex;
     align-items: center;
@@ -1331,12 +1296,6 @@
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
-
-<a class="access-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">
-  <span class="access-banner-label">Private preview</span>
-  <span class="access-banner-msg">Public download is paused — request access and we’ll be in touch.</span>
-  <span class="access-banner-cta">Request access →</span>
-</a>
 
 <!-- ═══ NAV ═══ -->
 <nav class="top-nav" aria-label="Site">
