@@ -232,13 +232,14 @@ npm run tauri build
 # → src-tauri/target/release/bundle/dmg/Janbot_0.1.0_aarch64.dmg
 ```
 
-To build a release and copy the DMG to `~/janbot.ai/` with a stable symlink:
+To build a release DMG locally:
 
 ```bash
 npm run build:release
-# → ~/janbot.ai/janbot-<version>-<timestamp>.dmg
-# → ~/janbot.ai/janbot-latest.dmg  (symlink to latest)
+# → src-tauri/target/release/bundle/dmg/Janbot_<version>_aarch64.dmg
 ```
+
+Public download hosting on `janbot.ai` is paused; share builds privately.
 
 ### Code signing & notarization (required for public distribution)
 

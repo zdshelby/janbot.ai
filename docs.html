@@ -46,7 +46,8 @@
     --ease: cubic-bezier(0.33, 0, 0.15, 1);
     --focus-ring: 0 0 0 3px rgba(255, 106, 0, 0.5);
     --frame: clamp(10px, 1.6vw, 18px);
-    --nav-h: 61px;
+    --banner-h: 42px;
+    --nav-h: 103px;
   }
 
   html { scroll-behavior: smooth; }
@@ -95,9 +96,34 @@
   .pill-line { border: 1.5px solid var(--line); color: var(--bone); }
   .pill-line:hover { border-color: rgba(255,106,0,.6); background: rgba(255,106,0,.05); }
 
-  /* ── Top nav (sticky) ── */
+  /* ── Access banner + sticky top nav ── */
+  .access-banner {
+    position: sticky; top: 0; z-index: 61;
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; flex-wrap: wrap;
+    min-height: var(--banner-h);
+    padding: 10px clamp(16px, 3vw, 28px);
+    background: var(--orange); color: var(--ink);
+    text-decoration: none;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em;
+    line-height: 1.35; text-align: center;
+    transition: background 0.18s var(--ease);
+  }
+  .access-banner:hover { background: #FF7D1F; }
+  .access-banner-label {
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .access-banner-msg { opacity: 0.88; }
+  .access-banner-cta {
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    border-bottom: 1.5px solid currentColor; padding-bottom: 1px;
+  }
+  @media (max-width: 640px) {
+    .access-banner-msg { display: none; }
+  }
+
   .top-nav {
-    position: sticky; top: 0; z-index: 60;
+    position: sticky; top: var(--banner-h); z-index: 60;
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px clamp(20px, 4vw, 44px);
     background: rgba(18, 18, 18, 0.82);
@@ -373,6 +399,12 @@
 
 <a class="skip" href="#getting-started">Skip to content</a>
 
+<a class="access-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">
+  <span class="access-banner-label">Private preview</span>
+  <span class="access-banner-msg">Public download is paused — request access and we’ll be in touch.</span>
+  <span class="access-banner-cta">Request access →</span>
+</a>
+
 <!-- ═══ NAV ═══ -->
 <nav class="top-nav" aria-label="Site">
   <a class="brand" href="index.html" aria-label="Janbot home">
@@ -388,7 +420,7 @@
   <div class="hero-nav-links">
     <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="docsNav">Contents</button>
     <a class="plain active" href="docs.html" aria-current="page">Docs</a>
-    <a class="pill pill-hot" href="janbot-latest.dmg" download>Download</a>
+    <a class="pill pill-hot" href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">Request access</a>
   </div>
 </nav>
 
@@ -421,7 +453,7 @@
     <div class="docs-hero rev">
       <p class="docs-kicker">Janbot help · macOS 14+ · Apple Silicon</p>
       <h1>Get Janbot running, then hand it real work.</h1>
-      <p>Janbot is a native Mac agent that reads your documents, runs commands, searches the web, remembers what matters, and repeats on a schedule. You pick the model, and your data stays on your machine. These pages take you from download to your first finished task, then cover every control in the app.</p>
+      <p>Janbot is a native Mac agent that reads your documents, runs commands, searches the web, remembers what matters, and repeats on a schedule. You pick the model, and your data stays on your machine. These pages take you from first install to your first finished task, then cover every control in the app.</p>
       <p class="hero-fine">new here? start with <a href="#getting-started" style="color:var(--orange);text-decoration:none;">Getting started</a> → then <a href="#chat" style="color:var(--orange);text-decoration:none;">Chat &amp; the agent</a></p>
     </div>
 
@@ -429,7 +461,7 @@
     <section class="doc rev" id="getting-started">
       <span class="chip">✦ Getting started</span>
       <h2>Install Janbot</h2>
-      <p class="lead">Janbot ships as a single Mac app. There's no account to create and nothing to meter. You download it, open it, and connect a model.</p>
+      <p class="lead">Janbot ships as a single Mac app. There's no account to create and nothing to meter. The public download is paused while we finish entity and EULA work; builds are shared privately with people who request access.</p>
 
       <h3>Requirements</h3>
       <div class="table-wrap">
@@ -444,16 +476,16 @@
         </table>
       </div>
 
-      <h3>Download &amp; open</h3>
+      <h3>Request access</h3>
       <ol>
-        <li>Download <code>janbot-latest.dmg</code> from the <a href="janbot-latest.dmg" download>Download button</a> at the top of any page.</li>
-        <li>Open the <code>.dmg</code> and drag <strong>Janbot</strong> into your <strong>Applications</strong> folder.</li>
+        <li>Use <a href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">Request access</a> to tell us you're interested.</li>
+        <li>If we share a build with you, open the <code>.dmg</code> and drag <strong>Janbot</strong> into your <strong>Applications</strong> folder.</li>
         <li>The first time you launch, right-click <span class="ui">Janbot.app</span> → <span class="ui">Open</span>, then confirm. After that it opens normally.</li>
       </ol>
 
       <div class="note warn">
-        <span class="note-label">Gatekeeper</span>
-        <p>The public build is an <strong>unsigned preview</strong>, so macOS may say it "cannot be verified." That's expected. Use <strong>right-click → Open</strong> once (not a double-click) to tell Gatekeeper you trust it. You only do this on first launch.</p>
+        <span class="note-label">Private preview</span>
+        <p>Installer links are not published on this site yet. Preview builds may be <strong>unsigned</strong>, so macOS may say the app "cannot be verified." Use <strong>right-click → Open</strong> once (not a double-click) if Gatekeeper prompts you.</p>
       </div>
 
       <div class="note">
@@ -857,8 +889,8 @@
       <h2>Common questions</h2>
       <p class="lead">Quick fixes for the things people hit first. If something here doesn't match the app, trust the app, since labels move faster than docs.</p>
 
-      <h3>Gatekeeper blocks the DMG</h3>
-      <p>The preview build is unsigned. Right-click <span class="ui">Janbot.app</span> → <span class="ui">Open</span> (don't double-click) and confirm once. See <a href="#getting-started">Install</a>.</p>
+      <h3>Gatekeeper blocks the app</h3>
+      <p>Private preview builds may be unsigned. Right-click <span class="ui">Janbot.app</span> → <span class="ui">Open</span> (don't double-click) and confirm once. See <a href="#getting-started">Install</a>.</p>
 
       <h3>No models, or "can't connect"</h3>
       <p>Is LM Studio or Ollama actually running? Check the ports (<code>1234</code> for LM Studio, <code>11434</code> for Ollama). For cloud, confirm the API key is saved in <span class="ui">Settings → Models</span>. Try <span class="ui">Auto-detect</span> and the in-app test.</p>
@@ -902,7 +934,7 @@
     <div class="foot-links">
       <a href="index.html">Home</a>
       <a href="docs.html">Docs</a>
-      <a href="janbot-latest.dmg" download>Download</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfitd2bcirZFSuv5LWFR64CkXnH7Dr53xU0hwhZsThrmVEXMA/viewform?usp=header" target="_blank" rel="noopener noreferrer">Request access</a>
     </div>
   </div>
 </footer>
